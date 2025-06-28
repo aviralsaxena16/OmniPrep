@@ -11,8 +11,23 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
 
-        <Route path="/sign-in" element={<SignIn redirectUrl="/home" />} />
-        <Route path="/sign-up" element={<SignUp redirectUrl="/home" />} />
+        <Route 
+          path="/sign-in" 
+          element={
+            <div className="min-h-screen bg-black flex items-center justify-center p-4">
+              <SignIn redirectUrl="/home" />
+            </div>
+          } 
+        />
+        
+        <Route 
+          path="/sign-up" 
+          element={
+            <div className="min-h-screen bg-black flex items-center justify-center p-4">
+              <SignUp redirectUrl="/home" />
+            </div>
+          } 
+        />
 
         <Route
           path="/home"
