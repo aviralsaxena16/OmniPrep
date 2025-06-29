@@ -17,7 +17,8 @@ import {
   Bell,
   Calendar,
   Download,
-  Activity
+  Activity,
+  ListTodo
 } from 'lucide-react';
 import { NavLink } from "react-router-dom"; // Added import
 
@@ -117,6 +118,10 @@ export default function PrepMateHomepage() {
                 <NavLink to="#" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
                   <FileText className="w-4 h-4 mr-1" />
                   Reports
+                </NavLink>
+                <NavLink to="/upcoming-interview" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                  <ListTodo className="w-4 h-4 mr-1" />
+                  Your Interviews
                 </NavLink>
               </div>
             </div>
