@@ -8,11 +8,10 @@ function VoiceAgent({ jobRole }) { // Assume jobRole is passed as a prop
     script.id = "omnidimension-web-widget";
 
     script.onload = () => {
-      // Ensure OmniDimension object is available
       if (window.OmniDimension && typeof window.OmniDimension.init === 'function') {
         window.OmniDimension.init({
           dynamic_variables: {
-            job_role: jobRole || "Software Engineer" // Pass your dynamic job role here
+            job_role: jobRole || "Software Engineer" 
           }
         });
       }
@@ -22,16 +21,16 @@ function VoiceAgent({ jobRole }) { // Assume jobRole is passed as a prop
 
     return () => {
       document.body.removeChild(script);
-      // Clean up OmniDimension instance if necessary
+      
       if (window.OmniDimension && typeof window.OmniDimension.destroy === 'function') {
         window.OmniDimension.destroy();
       }
     };
-  }, [jobRole]); // Re-run effect if jobRole changes
+  }, [jobRole]); 
 
   return (
     <div>
-      <h2>Voice Agent Ready</h2>
+      <h2></h2>
     </div>
   );
 }
