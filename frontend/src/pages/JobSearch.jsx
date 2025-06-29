@@ -1,167 +1,4 @@
 import React, { useState } from "react";
-import styled from "styled-components";
-
-// Styled-components for killer CSS
-const Container = styled.div`
-  display: flex;
-  min-height: 100vh;
-  background: #f6f7fb;
-  font-family: 'Segoe UI', Arial, sans-serif;
-`;
-
-const Sidebar = styled.div`
-  flex: 0 0 340px;
-  background: #fff;
-  padding: 2rem 1.5rem;
-  box-shadow: 2px 0 16px rgba(40, 60, 90, 0.07);
-  border-radius: 0 24px 24px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-`;
-
-const Main = styled.div`
-  flex: 1;
-  padding: 2.5rem 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-`;
-
-const Title = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  color: #1976d2;
-  margin-bottom: 1rem;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-`;
-
-const Label = styled.label`
-  font-size: 1rem;
-  font-weight: 500;
-`;
-
-const Input = styled.input`
-  padding: 0.7rem 1rem;
-  border: 1px solid #e0e6ed;
-  border-radius: 8px;
-  font-size: 1rem;
-`;
-
-const Select = styled.select`
-  padding: 0.7rem 1rem;
-  border: 1px solid #e0e6ed;
-  border-radius: 8px;
-  font-size: 1rem;
-`;
-
-const Button = styled.button`
-  background: #1976d2;
-  color: #fff;
-  padding: 0.9rem 0;
-  border: none;
-  border-radius: 8px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  transition: background 0.2s;
-  &:hover {
-    background: #1565c0;
-  }
-`;
-
-const JobsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 1.5rem;
-`;
-
-const JobCard = styled.div`
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(40, 60, 90, 0.09);
-  padding: 1.5rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: flex-start;
-`;
-
-const JobHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
-const Logo = styled.img`
-  width: 46px;
-  height: 46px;
-  border-radius: 8px;
-  background: #f0f0f0;
-  object-fit: contain;
-  border: 1px solid #eee;
-`;
-
-const JobInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-`;
-
-const JobTitle = styled.h3`
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin: 0;
-`;
-
-const Company = styled.span`
-  font-size: 0.97rem;
-  color: #1976d2;
-  font-weight: 500;
-`;
-
-const Location = styled.span`
-  font-size: 0.92rem;
-  color: #555;
-`;
-
-const Type = styled.span`
-  font-size: 0.89rem;
-  color: #888;
-  background: #e3f2fd;
-  border-radius: 6px;
-  padding: 2px 8px;
-  margin-top: 3px;
-  display: inline-block;
-`;
-
-const ApplyLink = styled.a`
-  background: #43b06c;
-  color: #fff;
-  padding: 0.6rem 1.3rem;
-  border-radius: 8px;
-  font-weight: 600;
-  text-decoration: none;
-  font-size: 1rem;
-  margin-top: 0.5rem;
-  transition: background 0.2s;
-  &:hover {
-    background: #388e3c;
-  }
-`;
-
-const NoJobs = styled.div`
-  text-align: center;
-  color: #888;
-  font-size: 1.2rem;
-  margin-top: 2rem;
-`;
 
 // API fetch function
 async function fetchJobs(params) {
@@ -220,81 +57,133 @@ export default function JobFetchApp() {
   };
 
   return (
-    <Container>
-      <Sidebar>
-        <Title>Find Jobs & Internships</Title>
-        <Form onSubmit={handleSubmit}>
+    <div className="min-h-screen bg-white flex">
+      {/* Sidebar */}
+      <div className="flex-none w-96 bg-white p-8 shadow-2xl border-r border-gray-100 flex flex-col gap-8">
+        <div>
+          <h1 className="text-4xl font-black text-black mb-4">Find Jobs</h1>
+          <p className="text-gray-600 text-lg">Discover your next opportunity</p>
+        </div>
+        
+        <div className="flex flex-col gap-6">
           <div>
-            <Label>Job Title & Location</Label>
-            <Input
+            <label className="text-lg font-bold text-black block mb-3">Job Title & Location</label>
+            <input
               name="query"
               placeholder="e.g. developer jobs in chicago"
               value={form.query}
               onChange={handleChange}
               required
+              className="w-full p-4 border-2 border-gray-200 rounded-2xl text-lg focus:border-black focus:outline-none transition-all duration-300 hover:border-gray-400"
             />
           </div>
+          
           <div>
-            <Label>Employment Type</Label>
-            <Select
+            <label className="text-lg font-bold text-black block mb-3">Employment Type</label>
+            <select
               name="employment_types"
               value={form.employment_types}
               onChange={handleChange}
+              className="w-full p-4 border-2 border-gray-200 rounded-2xl text-lg focus:border-black focus:outline-none transition-all duration-300 hover:border-gray-400 bg-white"
             >
-              <option value="">All</option>
+              <option value="">All Types</option>
               <option value="FULLTIME">Full-time</option>
               <option value="PARTTIME">Part-time</option>
               <option value="CONTRACTOR">Contractor</option>
               <option value="INTERN">Internship</option>
-            </Select>
+            </select>
           </div>
+          
           <div>
-            <Label>Posted Within</Label>
-            <Select
+            <label className="text-lg font-bold text-black block mb-3">Posted Within</label>
+            <select
               name="date_posted"
               value={form.date_posted}
               onChange={handleChange}
+              className="w-full p-4 border-2 border-gray-200 rounded-2xl text-lg focus:border-black focus:outline-none transition-all duration-300 hover:border-gray-400 bg-white"
             >
               <option value="all">Anytime</option>
               <option value="today">Today</option>
               <option value="3days">Last 3 Days</option>
               <option value="week">Last Week</option>
               <option value="month">Last Month</option>
-            </Select>
+            </select>
           </div>
-          <Button type="submit">{loading ? "Searching..." : "Search"}</Button>
-        </Form>
-      </Sidebar>
-      <Main>
+          
+          <button 
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full bg-black text-white p-5 rounded-2xl text-xl font-bold hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none mt-4"
+          >
+            {loading ? "Searching..." : "Search Jobs"}
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-8 flex flex-col gap-6">
         {loading ? (
-          <NoJobs>Loading jobs...</NoJobs>
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <div className="text-2xl font-bold text-black">Searching for jobs...</div>
+              <div className="text-gray-600 mt-2">Finding the best opportunities for you</div>
+            </div>
+          </div>
         ) : jobs.length === 0 ? (
-          <NoJobs>No jobs found. Try a different search.</NoJobs>
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-6xl mb-6">🔍</div>
+              <div className="text-3xl font-bold text-black mb-4">No jobs found</div>
+              <div className="text-xl text-gray-600">Try adjusting your search criteria</div>
+            </div>
+          </div>
         ) : (
-          <JobsGrid>
-            {jobs.map(job => (
-              <JobCard key={job.job_id}>
-                <JobHeader>
-                  {job.employer_logo ? (
-                    <Logo src={job.employer_logo} alt={job.employer_name} />
-                  ) : (
-                    <Logo as="div" />
-                  )}
-                  <JobInfo>
-                    <JobTitle>{job.job_title}</JobTitle>
-                    <Company>{job.employer_name}</Company>
-                    <Location>{job.job_location}</Location>
-                    <Type>{job.job_employment_type}</Type>
-                  </JobInfo>
-                </JobHeader>
-                <ApplyLink href={job.job_apply_link} target="_blank" rel="noopener noreferrer">
-                  Apply
-                </ApplyLink>
-              </JobCard>
-            ))}
-          </JobsGrid>
+          <>
+            <div className="mb-6">
+              <h2 className="text-3xl font-black text-black mb-2">Search Results</h2>
+              <p className="text-gray-600 text-lg">Found {jobs.length} opportunities for you</p>
+            </div>
+            
+            <div className="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
+              {jobs.map(job => (
+                <div key={job.job_id} className="bg-white border-2 border-gray-100 rounded-3xl p-8 hover:border-black hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 group">
+                  <div className="flex items-start gap-4 mb-6">
+                    {job.employer_logo ? (
+                      <img 
+                        src={job.employer_logo} 
+                        alt={job.employer_name}
+                        className="w-16 h-16 rounded-2xl object-contain border-2 border-gray-100 group-hover:border-black transition-all duration-300"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-2xl bg-gray-100 border-2 border-gray-200 group-hover:border-black transition-all duration-300"></div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl font-bold text-black mb-2 line-clamp-2 group-hover:text-gray-800 transition-colors duration-300">{job.job_title}</h3>
+                      <div className="text-lg font-semibold text-gray-800 mb-1">{job.employer_name}</div>
+                      <div className="text-gray-600 mb-3">{job.job_location}</div>
+                      {job.job_employment_type && (
+                        <span className="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-xl text-sm font-medium group-hover:bg-black group-hover:text-white transition-all duration-300">
+                          {job.job_employment_type}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <a 
+                    href={job.job_apply_link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-block w-full bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-lg text-center hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                  >
+                    Apply Now
+                  </a>
+                </div>
+              ))}
+            </div>
+          </>
         )}
-      </Main>
-    </Container>
+      </div>
+    </div>
   );
 }

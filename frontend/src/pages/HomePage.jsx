@@ -1,5 +1,5 @@
-import React, { useState , useEffect} from 'react';
-import { UserButton,useUser,useAuth } from "@clerk/clerk-react";
+import React, { useState, useEffect } from 'react';
+import { UserButton, useUser, useAuth } from "@clerk/clerk-react";
 import { 
   Menu, 
   X, 
@@ -19,63 +19,47 @@ import {
   Download,
   Activity
 } from 'lucide-react';
+import { NavLink } from "react-router-dom"; // Added import
 
 export default function PrepMateHomepage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoaded, isSignedIn, user } = useUser();
-   const { getToken } = useAuth();
-  //  useEffect(() => {
-  //   const syncUser = async () => {
-  //     if (!isSignedIn || !user) return;
+  const { getToken } = useAuth();
 
-  //     const token = await getToken(); // Clerk JWT for backend auth
+  useEffect(() => {
+    const syncUser = async () => {
+      if (!isSignedIn || !user) return;
 
-  //     await fetch("http://localhost:5000/store-user", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //   };
+      try {
+        const token = await getToken();
 
-  //   syncUser();
-  // }, [isSignedIn, user,getToken]);
-useEffect(() => {
-  const syncUser = async () => {
-    if (!isSignedIn || !user) return;
+        const userData = {
+          userId: user.id,
+          email: user.emailAddresses[0]?.emailAddress,
+          name: user.fullName,
+        };
 
-    try {
-      const token = await getToken();
+        console.log("User synced:", userData);
 
-      const userData = {
-        userId: user.id,
-        email: user.emailAddresses[0]?.emailAddress,
-        name: user.fullName,
-      };
+        const res = await fetch("http://localhost:5000/store-user", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(userData),
+        });
 
-      console.log("User synced:", userData);
-
-      const res = await fetch("http://localhost:5000/store-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (!res.ok) {
-        console.error("Failed to store user:", await res.text());
+        if (!res.ok) {
+          console.error("Failed to store user:", await res.text());
+        }
+      } catch (err) {
+        console.error("Error storing user:", err);
       }
-    } catch (err) {
-      console.error("Error storing user:", err);
-    }
-  };
+    };
 
-  syncUser();
-}, [isSignedIn, user, getToken]);
-
+    syncUser();
+  }, [isSignedIn, user, getToken]);
 
   const quickStats = [
     { label: "Interviews Completed", value: "12", icon: <Mic className="w-5 h-5 text-black" />, bg: "bg-gray-100" },
@@ -96,7 +80,6 @@ useEffect(() => {
     { company: "DataFlow Inc", position: "Full Stack Engineer", date: "July 2", time: "10:30 AM" }
   ];
 
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
@@ -115,26 +98,26 @@ useEffect(() => {
             {/* Desktop Menu */}
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-6">
-                <a href="#" className="text-black hover:text-gray-700 px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                <NavLink to="/home" className="text-black hover:text-gray-700 px-3 py-2 text-sm font-medium transition-colors flex items-center">
                   <BarChart3 className="w-4 h-4 mr-1" />
                   Dashboard
-                </a>
-                <a href="#" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                </NavLink>
+                <NavLink to="/mock-interview" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
                   <Mic className="w-4 h-4 mr-1" />
                   Mock Interviews
-                </a>
-                <a href="#" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                </NavLink>
+                <NavLink to="/practise-section" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
                   <FlaskConical className="w-4 h-4 mr-1" />
                   Practice Mode
-                </a>
-                <a href="#" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                </NavLink>
+                <NavLink to="/job-search" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
                   <Briefcase className="w-4 h-4 mr-1" />
                   Job Matching
-                </a>
-                <a href="#" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                </NavLink>
+                <NavLink to="#" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
                   <FileText className="w-4 h-4 mr-1" />
                   Reports
-                </a>
+                </NavLink>
               </div>
             </div>
             {/* User Profile & Notifications */}
@@ -142,9 +125,6 @@ useEffect(() => {
               <div className="flex items-center space-x-4">
                 <Settings className="w-5 h-5 text-gray-700 hover:text-black cursor-pointer" />
                 <UserButton afterSignOutUrl="/sign-in" />
-                {/* <div className="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors">
-                  <UserButton afterSignOutUrl="/sign-in" />
-                </div> */}
               </div>
             </div>
             {/* Mobile menu button */}
@@ -162,27 +142,26 @@ useEffect(() => {
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <a href="#" className="text-black block px-3 py-2 text-base font-medium items-center">
+              <NavLink to="/home" className="text-black block px-3 py-2 text-base font-medium items-center">
                 <BarChart3 className="w-4 h-4 mr-2" />
                 Dashboard
-              </a>
-              <a href="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
+              </NavLink>
+              <NavLink to="/mock-interview" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
                 <Mic className="w-4 h-4 mr-2" />
                 Mock Interviews
-              </a>
-              <a href="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
+              </NavLink>
+              <NavLink to="/practise-section" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
                 <FlaskConical className="w-4 h-4 mr-2" />
                 Practice Mode
-              </a>
-              <a href="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
+              </NavLink>
+              <NavLink to="/job-search" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
                 <Briefcase className="w-4 h-4 mr-2" />
                 Job Matching
-              </a>
-              <a href="#" className="text-gray-700 hover:t
-              ext-black block px-3 py-2 text-base font-medium items-center">
+              </NavLink>
+              <NavLink to="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
                 <FileText className="w-4 h-4 mr-2" />
                 Reports
-              </a>
+              </NavLink>
               <div className="border-t pt-4 pb-3">
                 <div className="flex items-center px-3 space-x-3">
                   <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-sm font-semibold">
@@ -231,10 +210,12 @@ useEffect(() => {
                 <p className="text-gray-600">Full interview simulation with AI feedback</p>
               </div>
             </div>
-            <button className="mt-4 bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors flex items-center w-fit">
-              Start Interview
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </button>
+            <NavLink to="/mock-interview">
+              <button className="mt-4 bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-900 transition-colors flex items-center w-fit">
+                Start Interview
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </button>
+            </NavLink>
           </div>
           {/* Practice Mode Card */}
           <div className="bg-gray-800 p-8 rounded-xl border border-gray-800 shadow-lg flex flex-col justify-between">
@@ -247,10 +228,12 @@ useEffect(() => {
                 <p className="text-gray-300">Quick practice on specific topics</p>
               </div>
             </div>
-            <button className="mt-4 bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center w-fit">
-              Start Practice
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </button>
+            <NavLink to="/practise-section">
+              <button className="mt-4 bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center w-fit">
+                Start Practice
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </button>
+            </NavLink>
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -258,7 +241,7 @@ useEffect(() => {
           <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-black">Recent Activity</h3>
-              <a href="#" className="text-black hover:text-gray-700 text-sm font-medium">View All</a>
+              <NavLink to="#" className="text-black hover:text-gray-700 text-sm font-medium">View All</NavLink>
             </div>
             <div className="space-y-4">
               {recentActivity.map((activity, index) => (
@@ -311,16 +294,12 @@ useEffect(() => {
             </div>
           </div>
         </div>
-        
-        
       </div>
-        <footer className="w-full bg-white border-t border-gray-200 py-6">
-  <div className="max-w-7xl mx-auto px-4 text-center text-gray-600 text-sm">
-    © 2025 PrepMate. All rights reserved. Built with <span className="text-red-500" aria-label="love">❤️</span> for your success.
-  </div>
-</footer>
-
-
+      <footer className="w-full bg-white border-t border-gray-200 py-6">
+        <div className="max-w-7xl mx-auto px-4 text-center text-gray-600 text-sm">
+          © 2025 PrepMate. All rights reserved. Built with <span className="text-red-500" aria-label="love">❤️</span> for your success.
+        </div>
+      </footer>
     </div>
   );
 }

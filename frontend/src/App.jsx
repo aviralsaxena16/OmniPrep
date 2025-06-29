@@ -4,14 +4,16 @@ import { SignIn, SignUp } from "@clerk/clerk-react";
 import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import Mockinterview from "./pages/Mockinterview";
 import JobSearch from "./pages/JobSearch";
+import PractiseSection from "./pages/PractiseSection";
+import Mockinterview from "./pages/Mockinterview";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/practise-section" element={<PractiseSection />} />
         <Route path="/mock-interview" element={<Mockinterview />} />
         <Route path="/job-search" element={<JobSearch />} />
 
