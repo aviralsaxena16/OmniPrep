@@ -162,24 +162,24 @@ useEffect(() => {
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <a href="#" className="text-black block px-3 py-2 text-base font-medium flex items-center">
+              <a href="#" className="text-black block px-3 py-2 text-base font-medium items-center">
                 <BarChart3 className="w-4 h-4 mr-2" />
                 Dashboard
               </a>
-              <a href="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium flex items-center">
+              <a href="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
                 <Mic className="w-4 h-4 mr-2" />
                 Mock Interviews
               </a>
-              <a href="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium flex items-center">
+              <a href="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
                 <FlaskConical className="w-4 h-4 mr-2" />
                 Practice Mode
               </a>
-              <a href="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium flex items-center">
+              <a href="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
                 <Briefcase className="w-4 h-4 mr-2" />
                 Job Matching
               </a>
               <a href="#" className="text-gray-700 hover:t
-              ext-black block px-3 py-2 text-base font-medium flex items-center">
+              ext-black block px-3 py-2 text-base font-medium items-center">
                 <FileText className="w-4 h-4 mr-2" />
                 Reports
               </a>
