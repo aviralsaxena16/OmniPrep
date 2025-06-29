@@ -26,14 +26,31 @@ router.get('/results/:callId', (req, res) => {
 });
 
 // Get all interview results (optional - for admin/debugging)
-router.get('/results', (req, res) => {
+// Webhook endpoint to receive interview results
+router.post('/results', (req, res) => {
   try {
-    res.json(interviewResultsStore);
+    const { callId, extractedInfo, fullConversation, timestamp } = req.body;
+
+    if (!callId) {
+      return res.status(400).json({ error: 'Missing callId in request body' });
+    }
+
+    const result = {
+      callId,
+      extractedInfo,
+      fullConversation,
+      timestamp: timestamp || new Date().toISOString(),
+    };
+
+    interviewResultsStore[callId] = result;
+    console.log(`✅ Received interview result for callId: ${callId}`);
+    res.status(200).json({ message: 'Result stored successfully' });
   } catch (error) {
-    console.error('Error fetching all interview results:', error);
-    res.status(500).json({ error: 'Failed to fetch interview results' });
+    console.error('❌ Error storing interview result:', error);
+    res.status(500).json({ error: 'Failed to store interview result' });
   }
 });
+
 
 // Store interview result (used by webhook)
 export const storeInterviewResult = (callId, data) => {

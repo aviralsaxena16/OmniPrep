@@ -1,3 +1,4 @@
+import axios from 'axios'; // Added axios import
 import express from 'express';
 import cors from 'cors';
 import { connectDB, closeDB } from './db.js';
@@ -13,6 +14,7 @@ app.use('/api/webhooks', express.raw({ type: 'application/json' }));
 // Regular JSON middleware for other routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Removed duplicate express.json()
 
 // CORS configuration
 app.use(cors({
@@ -57,6 +59,73 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// OmniDimension call endpoint
+app.post('/api/start-omnidimension-call', async (req, res) => {
+  try {
+    const {
+      call_id,
+      name,
+      education,
+      experience,
+      job_role,
+      company_name
+    } = req.body;
+
+    // Check env variables
+    if (!process.env.OMNIDIMENSION_API_KEY || !process.env.OMNIDIMENSION_AGENT_ID) {
+      return res.status(500).json({ 
+        error: 'OmniDimension credentials are missing in environment variables' 
+      });
+    }
+
+    // Input validation
+    if (!call_id || !name) {
+      return res.status(400).json({ error: 'call_id and name are required' });
+    }
+
+    // OmniDimension API Request
+    const omniRes = await axios.post(
+      'https://api.omnidim.io/api/v1/call/start',
+      {
+        agent_id: process.env.OMNIDIMENSION_AGENT_ID,
+        call_type: 'web_call',
+        custom_data: {
+          name,
+          education,
+          experience,
+          job_role,
+          company_name,
+          call_id
+        }
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OMNIDIMENSION_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: 'OmniDimension call started successfully',
+      data: omniRes.data
+    });
+  } catch (error) {
+    console.error('Error starting OmniDimension call:', error?.response?.data || error.message);
+
+    const status = error?.response?.status || 500;
+    const errorData = error?.response?.data || {};
+
+    res.status(status).json({
+      success: false,
+      error: errorData.error || 'Unknown error',
+      message: error.message,
+      status
+    });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err);
@@ -67,42 +136,24 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  console.log('404 - Route not found:', req.method, req.originalUrl);
-  res.status(404).json({ 
-    error: 'Route not found',
-    method: req.method,
-    path: req.originalUrl,
-    timestamp: new Date().toISOString()
-  });
-});
-
 // Start server
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
-  console.log(`Test API: http://localhost:${PORT}/api/test`);
 });
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
+const shutdown = () => {
+  console.log('Shutdown signal received, closing server');
   server.close(() => {
     console.log('Server closed');
     closeDB();
     process.exit(0);
   });
-});
+};
 
-process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
-  server.close(() => {
-    console.log('Server closed');
-    closeDB();
-    process.exit(0);
-  });
-});
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
 
 export default app;
