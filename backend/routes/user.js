@@ -1,7 +1,7 @@
 // routes/user.js
 import express from "express";
 import User from "../models/User.js";
-
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -76,6 +76,62 @@ router.get("/upcoming-interviews", async (req, res) => {
 
     res.json(user.upcomingInterviews);
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+//mark interview as done 
+
+// router.patch("/mark-done", async (req, res) => {
+//   try {
+//     const { email, interviewId } = req.body;
+//     console.log("Email:", email);
+//     console.log("Interview ID:", interviewId);
+//     if (!email || !interviewId) return res.status(400).json({ message: "Email and interviewId required" });
+
+//      const objectId = new mongoose.Types.ObjectId(interviewId);
+
+//     const user = await User.findOneAndUpdate(
+//       { email, "upcomingInterviews._id": objectId },
+//       { $set: { "upcomingInterviews.$.done": true } },
+//       { new: true }
+//     );
+//     if (!user) return res.status(404).json({ message: "User not found" });
+
+//     res.json(user.upcomingInterviews);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
+router.patch("/mark-done", async (req, res) => {
+  try {
+    const { email, interviewId } = req.body;
+    console.log("interviewId:", interviewId);
+    if (!email || !interviewId) {
+      return res.status(400).json({ message: "Email and interviewId required" });
+    }
+
+    const objectId = new mongoose.Types.ObjectId(interviewId);
+    console.log("Email:", email);
+    console.log("Converted ObjectId:", objectId);
+ 
+    const user = await User.findOne({ email });
+    console.log("User's Interview IDs:", user.upcomingInterviews.map(i => i._id));
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const interview = user.upcomingInterviews.id(objectId);
+    if (!interview) {
+      return res.status(404).json({ message: "Interview not found" });
+    }
+
+    interview.done = true;
+    await user.save();
+
+    res.json(user.upcomingInterviews);
+  } catch (error) {
+    console.error("Error marking interview done:", error);
     res.status(500).json({ message: error.message });
   }
 });

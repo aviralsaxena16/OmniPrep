@@ -10,7 +10,8 @@ const upcomingInterviewSchema = new mongoose.Schema({
   location: { type: String },
   jobDescription: { type: String },
   priority: { type: String, enum: ["High", "Medium", "Low"], default: "Medium" },
-}, { _id: false }); 
+  done: { type: Boolean, default: false }
+}, { _id: true }); 
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },

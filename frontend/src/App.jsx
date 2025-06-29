@@ -6,7 +6,7 @@ import HomePage from "./pages/HomePage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Mockinterview from "./pages/Mockinterview";
 import JobSearch from "./pages/JobSearch";
-
+import UpcomingInterviewsPage from "./pages/UpcomingInterview";
 function App() {
   return (
     <Router>
