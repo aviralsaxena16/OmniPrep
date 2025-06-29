@@ -5,13 +5,15 @@ import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Mockinterview from "./pages/Mockinterview";
-import UpcomingInterviewsPage from "./pages/UpcomingInterview";
+import JobSearch from "./pages/JobSearch";
+
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/mock-interview" element={<Mockinterview />} />
+        <Route path="/job-search" element={<JobSearch />} />
 
         <Route 
           path="/sign-in" 
