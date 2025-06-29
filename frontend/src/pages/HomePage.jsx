@@ -164,10 +164,13 @@ export default function PrepMateHomepage() {
               </NavLink>
               <div className="border-t pt-4 pb-3">
                 <div className="flex items-center px-3 space-x-3">
-                  <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                    JD
+                  <div>
+                    <UserButton/>
                   </div>
-                  <span className="text-sm font-medium text-gray-700">John Doe</span>
+                  {isSignedIn && user && (
+  <span className="text-sm font-medium text-gray-700">{user.fullName}</span>
+ )}
+
                 </div>
               </div>
             </div>

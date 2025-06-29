@@ -7,6 +7,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import JobSearch from "./pages/JobSearch";
 import PractiseSection from "./pages/PractiseSection";
 import Mockinterview from "./pages/Mockinterview";
+import UpcomingInterviewsPage from "./pages/UpcomingInterview";
 
 function App() {
   return (
@@ -40,6 +41,15 @@ function App() {
           element={
             <ProtectedRoute>
               <HomePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/upcoming-interview"
+          element={
+            <ProtectedRoute>
+              <UpcomingInterviewsPage/>
             </ProtectedRoute>
           }
         />

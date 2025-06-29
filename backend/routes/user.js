@@ -27,5 +27,57 @@ router.post("/store-user", async (req, res) => {
   }
 });
 
+//add a upcoming interview
+router.post("/upcoming-interviews", async (req, res) => {
+  try {
+    // Get email from frontend (req.body)
+    const { email, company, jobRole, interviewDate, interviewTime, jobLink, location, jobDescription, priority } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const newInterview = {
+      company,
+      jobRole,
+      interviewDate,
+      interviewTime,
+      jobLink,
+      location,
+      jobDescription,
+      priority,
+    };
+
+    // Find user by email and push to upcomingInterviews
+    const user = await User.findOneAndUpdate(
+      { email },
+      { $push: { upcomingInterviews: newInterview } },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(201).json(user.upcomingInterviews);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// fetch all the upcoming interviews
+router.get("/upcoming-interviews", async (req, res) => {
+  try {
+    const { email } = req.query;
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email }, "upcomingInterviews");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user.upcomingInterviews);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 export default router;
