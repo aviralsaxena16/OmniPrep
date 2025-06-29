@@ -1,31 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { UserButton, useUser, useAuth } from "@clerk/clerk-react";
-import { 
-  Menu, 
-  X, 
-  Mic, 
-  TrendingUp, 
-  FlaskConical, 
-  Briefcase, 
-  BarChart3, 
-  Target, 
-  Clock, 
-  FileText,
-  ArrowRight,
-  Zap,
-  Settings,
-  Bell,
-  Calendar,
-  Download,
-  Activity,
-  ListTodo
-} from 'lucide-react';
-import { NavLink } from "react-router-dom"; // Added import
+import {  Menu, X, Mic,  TrendingUp,  FlaskConical, Briefcase,  BarChart3, Target, Clock, FileText,ArrowRight,Zap,Settings,Bell,Calendar,Download, Activity, ListTodo} from 'lucide-react';
+import { NavLink ,useNavigate} from "react-router-dom"; // Added import
 
 export default function PrepMateHomepage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoaded, isSignedIn, user } = useUser();
   const { getToken } = useAuth();
+ const [interviews, setInterviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const syncUser = async () => {
@@ -61,6 +46,43 @@ export default function PrepMateHomepage() {
 
     syncUser();
   }, [isSignedIn, user, getToken]);
+
+    // Fetch interviews from backend
+    const fetchInterviews = async () => {
+      if (!user?.primaryEmailAddress?.emailAddress) return;
+      setLoading(true);
+      try {
+        const res = await fetch(
+          `http://localhost:5000/upcoming-interviews?email=${encodeURIComponent(
+            user.primaryEmailAddress.emailAddress
+          )}`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setInterviews(data);
+        } else {
+          setInterviews([]);
+        }
+      } catch {
+        setInterviews([]);
+      }
+      setLoading(false);
+    };
+  
+    useEffect(() => {
+      if (isLoaded && isSignedIn) fetchInterviews();
+      // eslint-disable-next-line
+    }, [isLoaded, isSignedIn]);
+
+  const upcoming = interviews
+  .filter((iv) => !iv.done)
+  .sort((a, b) => {
+    const aDateTime = new Date(`${a.interviewDate}T${a.interviewTime}`);
+    const bDateTime = new Date(`${b.interviewDate}T${b.interviewTime}`);
+    return aDateTime - bDateTime;
+  })
+  .slice(0, 3);
+
 
   const quickStats = [
     { label: "Interviews Completed", value: "12", icon: <Mic className="w-5 h-5 text-black" />, bg: "bg-gray-100" },
@@ -277,30 +299,33 @@ export default function PrepMateHomepage() {
           {/* Upcoming Interviews */}
           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-black">Upcoming</h3>
+              <h3 className="text-xl font-semibold text-black">Upcoming Interviews</h3>
               <Calendar className="w-5 h-5 text-gray-400" />
             </div>
             <div className="space-y-4">
-              {upcomingInterviews.map((interview, index) => (
+              {upcoming.length>0 ? (
+              upcoming.map((interview, index) => (
                 <div key={index} className="p-4 border border-gray-200 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-semibold text-black">{interview.company}</h4>
                     <span className="text-xs bg-gray-200 text-black px-2 py-1 rounded-full">
-                      {interview.date}
+                      {new Date(interview.interviewDate).toLocaleDateString()}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 mb-2">{interview.position}</p>
+                  <p className="text-sm text-gray-700 mb-2">{interview.jobRole}</p>
                   <div className="flex items-center text-xs text-gray-500">
                     <Clock className="w-3 h-3 mr-1" />
-                    {interview.time}
+                    {interview.interviewTime}
                   </div>
                 </div>
-              ))}
-              <button className="w-full text-center text-black hover:text-gray-700 text-sm font-medium py-2">
-                Schedule Practice Interview
+              ))
+              ):(<p className="text-sm text-gray-500 text-center">No upcoming interviews</p>)}
+                <button onClick={() => navigate("/upcoming-interview")} className="w-full text-center text-black hover:text-gray-700 text-sm font-medium py-2">
+                Click to See your all interviews
               </button>
             </div>
           </div>
+
         </div>
       </div>
       <footer className="w-full bg-white border-t border-gray-200 py-6">
