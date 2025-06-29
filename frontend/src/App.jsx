@@ -5,7 +5,7 @@ import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/HomePage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Mockinterview from "./pages/Mockinterview";
-
+import UpcomingInterviewsPage from "./pages/UpcomingInterview";
 function App() {
   return (
     <Router>
@@ -36,6 +36,15 @@ function App() {
           element={
             <ProtectedRoute>
               <HomePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/upcoming-interview"
+          element={
+            <ProtectedRoute>
+              <UpcomingInterviewsPage/>
             </ProtectedRoute>
           }
         />

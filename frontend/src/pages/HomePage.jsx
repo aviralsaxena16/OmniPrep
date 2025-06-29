@@ -24,23 +24,7 @@ export default function PrepMateHomepage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoaded, isSignedIn, user } = useUser();
    const { getToken } = useAuth();
-  //  useEffect(() => {
-  //   const syncUser = async () => {
-  //     if (!isSignedIn || !user) return;
 
-  //     const token = await getToken(); // Clerk JWT for backend auth
-
-  //     await fetch("http://localhost:5000/store-user", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //   };
-
-  //   syncUser();
-  // }, [isSignedIn, user,getToken]);
 useEffect(() => {
   const syncUser = async () => {
     if (!isSignedIn || !user) return;
@@ -141,10 +125,22 @@ useEffect(() => {
             <div className="hidden md:block">
               <div className="flex items-center space-x-4">
                 <Settings className="w-5 h-5 text-gray-700 hover:text-black cursor-pointer" />
-                <UserButton afterSignOutUrl="/sign-in" />
-                {/* <div className="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg hover:bg-gray-200 cursor-pointer transition-colors">
-                  <UserButton afterSignOutUrl="/sign-in" />
-                </div> */}
+                     <UserButton
+                        afterSignOutUrl="/sign-in"
+                        userProfileMode="modal"
+                         appearance={{
+                           baseTheme: "light", // ← Force light theme
+                           elements: {
+                             userButtonPopoverCard: "bg-white text-black shadow-md rounded-lg",
+                             userButtonPopoverActionButtonText: "text-gray-700 hover:text-black",
+                             userButtonPopoverActionButtonIcon: "text-gray-500",
+                             userButtonPopoverFooter: "border-t border-gray-200 text-gray-400 text-sm",
+                             userButtonPopoverHeader: "text-black", // for name/email
+                           },
+                         }}
+                       />
+
+
               </div>
             </div>
             {/* Mobile menu button */}
@@ -185,10 +181,13 @@ useEffect(() => {
               </a>
               <div className="border-t pt-4 pb-3">
                 <div className="flex items-center px-3 space-x-3">
-                  <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-sm font-semibold">
-                    JD
+                  <div>
+                    <UserButton/>
                   </div>
-                  <span className="text-sm font-medium text-gray-700">John Doe</span>
+                  {isSignedIn && user && (
+  <span className="text-sm font-medium text-gray-700">{user.fullName}</span>
+ )}
+
                 </div>
               </div>
             </div>
