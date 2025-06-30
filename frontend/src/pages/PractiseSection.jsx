@@ -1,6 +1,6 @@
 import { useState } from "react";
 import VoiceAgent from "./VoiceAgent2";
-
+import { Mic, User, Target, Brain, MessageSquare, Star, ArrowRight } from "lucide-react";
 function PractiseSection() {
   const [jobRole, setJobRole] = useState("");
   const [feedback, setFeedback] = useState(null);
