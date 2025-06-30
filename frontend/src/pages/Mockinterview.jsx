@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import VoiceAgent from './VoiceAgent';
-import MockinterviewResults from './MockinterviewResult';
+import MockinterviewResults from './MockInterviewResult';
 
 const Mockinterview = () => {
   const [currentView, setCurrentView] = useState('form'); // 'form', 'interview', 'results'

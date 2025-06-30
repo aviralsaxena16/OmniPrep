@@ -1,38 +1,39 @@
 import express from 'express';
-import { storeInterviewResult } from './interview.js';
+import { storeInterviewResult } from './store.js'; // Adjust path if needed
 
 const router = express.Router();
 
-// OmniDimension webhook endpoint
-router.post('/omnidimension-webhook', (req, res) => {
+// POST /api/webhooks/omnidimension
+router.post('/omnidimension', async (req, res) => {
   try {
-    console.log('Received Webhook Payload:');
-    const payload = req.body;
+    let payload;
 
-    const callId = payload.call_id;
-    const extractedInfo = payload.extracted_info;
-    const fullConversation = payload.full_conversation;
-
-    if (!callId || !extractedInfo) {
-      console.warn('Webhook payload missing call_id or extracted_info.');
-      return res.status(400).json({ 
-        error: 'Missing required fields: call_id or extracted_info' 
-      });
+    // Handle Buffer-wrapped JSON (from some webhook providers)
+    if (req.body?.type === 'Buffer' && Array.isArray(req.body.data)) {
+      const buffer = Buffer.from(req.body.data);
+      payload = JSON.parse(buffer.toString('utf-8'));
+    } else {
+      payload = req.body;
     }
 
-    // Store the interview result
-    storeInterviewResult(callId, {
-      extractedInfo,
-      fullConversation,
-      timestamp: new Date()
+    console.log('📥 Decoded Webhook Payload:', payload);
+
+    const { call_id, extracted_info, full_conversation } = payload;
+
+    if (!call_id || !extracted_info) {
+      return res.status(400).json({ error: 'Missing required fields: call_id or extracted_info' });
+    }
+
+    await storeInterviewResult(call_id, {
+      extractedInfo: extracted_info,
+      fullConversation: full_conversation,
+      timestamp: new Date(),
     });
 
-    console.log(`Stored results for callId: ${callId}`);
-    res.status(200).json({ message: 'Webhook received successfully!' });
-
-  } catch (error) {
-    console.error('Error processing webhook:', error);
-    res.status(500).json({ error: 'Failed to process webhook' });
+    return res.status(200).json({ message: '✅ Webhook received and stored!' });
+  } catch (err) {
+    console.error('❌ Webhook processing error:', err);
+    return res.status(500).json({ error: 'Failed to process webhook' });
   }
 });
 

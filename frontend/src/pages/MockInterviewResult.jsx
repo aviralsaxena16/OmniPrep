@@ -14,13 +14,16 @@ const MockinterviewResults = ({ callId, onBack }) => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Replace with your actual backend URL
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+      // UPDATED ENDPOINT:
       const response = await fetch(`${backendUrl}/api/interviews/results/${callId}`);
-      
+
+
       if (response.ok) {
         const data = await response.json();
+        console.log("result is fine")
         setResults(data);
         setLoading(false);
         return true;
@@ -47,7 +50,7 @@ const MockinterviewResults = ({ callId, onBack }) => {
 
     const attemptFetch = async () => {
       const success = await fetchResults();
-      
+
       if (!success && retryCount < maxRetries) {
         // Retry after delay
         setTimeout(() => {
@@ -57,6 +60,7 @@ const MockinterviewResults = ({ callId, onBack }) => {
     };
 
     attemptFetch();
+    // eslint-disable-next-line
   }, [callId, retryCount]);
 
   const handleManualRetry = () => {
@@ -120,7 +124,6 @@ const MockinterviewResults = ({ callId, onBack }) => {
               </button>
               <h1 className="text-2xl font-bold text-white">Interview Results</h1>
             </div>
-
             <div className="text-center py-12">
               <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
               <h2 className="text-xl font-semibold text-red-400 mb-2">Error Loading Results</h2>
@@ -209,7 +212,6 @@ const MockinterviewResults = ({ callId, onBack }) => {
             </button>
             <h1 className="text-2xl font-bold text-white">Interview Results</h1>
           </div>
-
           {/* Success indicator */}
           <div className="bg-green-900 border border-green-700 rounded-lg p-4 mb-6 flex items-center space-x-3">
             <CheckCircle className="w-8 h-8 text-green-400" />
