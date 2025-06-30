@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { connectDB, closeDB } from './db.js';
 import userRoutes from './routes/user.js';
-import webhookRoutes from './routes/webhook.js'; // ✅
+import webhookRoutes from './routes/webhook.js'; 
 import interviewRoutes from './routes/interview.js';
 
 const app = express();
@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({
   origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/api/users", userRoutes);
+app.use("/", userRoutes);
 app.use("/api/interviews", interviewRoutes);
 app.use("/api/webhooks", webhookRoutes); // ✅
 

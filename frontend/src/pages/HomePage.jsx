@@ -98,11 +98,6 @@ export default function PrepMateHomepage() {
     { action: "Job Match Found", role: "React Developer at StartupXYZ", time: "3 days ago", score: null }
   ];
 
-  const upcomingInterviews = [
-    { company: "TechCorp", position: "Senior Frontend Developer", date: "Tomorrow", time: "2:00 PM" },
-    { company: "DataFlow Inc", position: "Full Stack Engineer", date: "July 2", time: "10:30 AM" }
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
