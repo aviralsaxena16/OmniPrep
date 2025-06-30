@@ -217,7 +217,7 @@ function LandingPage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="relative z-10 py-20 px-8 bg-black text-white">
+      {/* <section className="relative z-10 py-20 px-8 bg-black text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Ready to Ace Your Next Interview?
@@ -234,10 +234,10 @@ function LandingPage() {
             </Link>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Footer */}
-      <footer className="relative z-10 bg-gray-900 text-white py-12 px-8">
+      <footer className="relative z-10 bg-black text-white py-12 px-8">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
