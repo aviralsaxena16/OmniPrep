@@ -1,5 +1,5 @@
 import { useState } from "react";
-import VoiceAgent from "./VoiceAgent";
+import VoiceAgent from "./VoiceAgent2";
 
 function PractiseSection() {
   const [jobRole, setJobRole] = useState("");

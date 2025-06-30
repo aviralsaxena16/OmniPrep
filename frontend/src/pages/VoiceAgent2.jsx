@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Mic, Phone, PhoneOff, Clock, User, AlertCircle } from 'lucide-react';
 
 
-function VoiceAgent({ name, education, experience, jobRole, companyName, callId }) {
+function VoiceAgent2({ name, education, experience, jobRole, companyName, callId }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [widgetReady, setWidgetReady] = useState(false);
@@ -125,4 +125,4 @@ function VoiceAgent({ name, education, experience, jobRole, companyName, callId 
 }
 
 
-export default VoiceAgent;
+export default VoiceAgent2;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import VoiceAgent from './VoiceAgent';
+import VoiceAgent2 from './VoiceAgent2';
 import MockinterviewResults from './MockInterviewResult';
 
 const Mockinterview = () => {
@@ -114,7 +114,7 @@ const Mockinterview = () => {
             )}
           </div>
           
-          <VoiceAgent 
+          <VoiceAgent2 
             name={formData.name}
             education={formData.education}
             experience={formData.experience}
