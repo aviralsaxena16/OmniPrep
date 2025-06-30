@@ -12,8 +12,8 @@ const MockinterviewResults = ({ callId, onBack }) => {
 
   // Use VITE_BACKEND_URL if set, otherwise fallback to localhost
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-  const fetchUrl = `${backendUrl}/api/interviews/results/${callId}`;
-  // const fetchUrl = `${backendUrl}/api/interviews/results/interview_1751257984779_kqw708vt9`;
+  // const fetchUrl = `${backendUrl}/api/interviews/results/${callId}`;
+  const fetchUrl = `${backendUrl}/api/interviews/results/interview_1751257984779_kqw708vt9`;
 
   const fetchResults = async () => {
     try {
