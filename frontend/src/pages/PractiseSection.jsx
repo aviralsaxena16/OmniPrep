@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Mic, User, Target, Brain, MessageSquare, Star, ArrowRight } from "lucide-react";
-import VoiceAgent from './VoiceAgent'
-// Mock VoiceAgent component for demo...
+import VoiceAgent from "./VoiceAgent2";
+
 function PractiseSection() {
   const [jobRole, setJobRole] = useState("");
   const [feedback, setFeedback] = useState(null);
