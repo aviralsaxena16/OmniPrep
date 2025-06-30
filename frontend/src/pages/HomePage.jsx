@@ -110,7 +110,7 @@ export default function PrepMateHomepage() {
                 <Zap className="w-6 h-6" />
               </div>
               <span className="text-2xl font-bold text-black">
-                PrepMate
+                OmniPrep
               </span>
             </div>
             {/* Desktop Menu */}
@@ -325,7 +325,7 @@ export default function PrepMateHomepage() {
       </div>
       <footer className="w-full bg-white border-t border-gray-200 py-6">
         <div className="max-w-7xl mx-auto px-4 text-center text-gray-600 text-sm">
-          © 2025 PrepMate. All rights reserved. Built with <span className="text-red-500" aria-label="love">❤️</span> for your success.
+          © 2025 OmniPrep. All rights reserved. Built with <span className="text-red-500" aria-label="love">❤️</span> for your success.
         </div>
       </footer>
     </div>
