@@ -3,7 +3,7 @@ import { useEffect } from "react";
 function VoiceAgent({ jobRole }) { // Assume jobRole is passed as a prop
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = import.meta.env.VITE_OMNIDIMENSION_WIDGET_URL;
+    script.src = import.meta.env.VITE_OMNIDIMENSION_WIDGET_URL_PRACTICE;
     script.async = true;
     script.id = "omnidimension-web-widget";
 
