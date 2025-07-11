@@ -6,7 +6,8 @@
 
 <br>
 
-<img src="frontend/public/int.png" width="400px">
+<img src="frontend/public/int.png" width="500px">
+<img src="frontend/public/Home.png" width="500px">
 
 ---
 
