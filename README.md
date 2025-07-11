@@ -1,60 +1,45 @@
-# OmniPrep 🎤💼
+# 🎤💼 OmniPrep – Your AI Voice Coach for Interviews
 
-OmniPrep is an AI-powered, voice-based interview preparation platform focused on enhancing confidence, communication, and soft skills in job seekers — especially students from underrepresented backgrounds.
+> *"Built for the millions of job seekers who never had access to mock interviews, personal coaching, or English fluency — until now."*
 
----
-### 📦 Project Structure
+**OmniPrep** is an AI-powered, voice-first interview preparation platform that simulates real-life interviews, analyzes speech for filler words and hesitation, and provides actionable, spoken feedback — built especially for **Tier-2/3 students and underrepresented job seekers**.
 
-OmniPrep is divided into two main parts:
+<br>
 
-- **[`frontend/`](./frontend)** – React + Vite-powered UI for mock interviews, practice section, voice feedback, job search, and more.
-- **[`backend/`](./backend)** – Node.js Express API integrated with MongoDB, Clerk authentication, and OmniDimension voice widget support.
----
-### 🧰 Tech Stack
-
-- **Frontend:** React, Vite, Tailwind CSS, Clerk (Auth)
-- **Backend:** Node.js, Express, MongoDB
-- **Voice AI:** OmniDimension Widget
----
-
-### 🔗 Quick Links
-
-| Component       | Description                                                    | README                                     |
-|----------------|----------------------------------------------------------------|--------------------------------------------|
-| 🎯 **Frontend** | React-based user interface for interaction and visualization  | [`frontend/README.md`](./frontend/README.md) |
-| 🧠 **Backend**  | Node.js + Clerk + OmniDimension API for voice AI and routing  | [`backend/README.md`](./backend/README.md)  |
+<img src="frontend/public/int.png" width="400px">
 
 ---
 
-## 🚀 How to Get Started
+## 🌟 Why OmniPrep?
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/aviralsaxena16/VoiceMirror
-   cd VoiceMirror
-   ```
+> ⚠️ Not your typical interview prep tool — OmniPrep gives you **live, AI-powered, voice-based mock interviews** with real-time spoken feedback to actually improve how you sound, not just what you say.
 
-2. **Navigate to the Desired Component**
-   ```bash
-   cd frontend  # For frontend setup
-   cd backend    # For backend setup
-   ```
+Traditional interview prep platforms are text-heavy, generic, and expensive. OmniPrep flips the model:
 
-3. **Follow the setup instructions in the respective README files.**
+- 🎙 **Voice-Based Practice** — Speak naturally with two trained AI agents, just like a real interview.
+- 🔁 **Real-Time Spoken Feedback** — Detects filler words, pacing, tone, and clarity.
+- 🎯 **Job-Aware Prep** — Practice interviews for actual roles via the built-in job search assistant.
+- 🤝 **Inclusive Design** — Lightweight, mobile-friendly, and designed for non-English-medium learners.
+- 💬 **Free & Always-On** — No scheduling mock calls. No mentors needed. Just you and your AI coach.
 
 ---
 
-## 🤝 Contributors
+## 🧰 Tech Stack
 
-| Name | Role | Github |
-|------|------|-------|
-| Aviral Saxena | Team Lead | https://github.com/aviralsaxena16 |
-|Pobitro Bhattacharya| Developer | https://github.com/Pobitro-B|
-| Sakshi Jadhav | Developer | https://github.com/sakshi1755 |
-| Harshita Patidar | Developer | https://github.com/harshitap1305 |
+| Layer       | Technology                                                                 |
+|-------------|----------------------------------------------------------------------------|
+| Frontend    | React, Vite, Tailwind CSS, Clerk (Authentication)                          |
+| Backend     | Node.js, Express, MongoDB                                                  |
+| Voice AI    | OmniDimension Voice Agent (Dual-Agent Setup for Practice + Simulation)     |
+| Job Search  | Real-time job fetching via external Job APIs                               |
 
 ---
 
-<div align="center">
-  <strong>Made with ❤️ by Team Null Pointers 4.0</strong>
-</div>
+## 🧱 Project Structure
+
+```bash
+OmniPrep/
+│
+├── frontend/   # React app with voice UI, feedback dashboard, job search
+├── backend/    # Node.js API, Clerk auth, MongoDB, OmniDimension agent integration
+└── README.md   # You're here!
