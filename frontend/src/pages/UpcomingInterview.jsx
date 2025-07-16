@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Plus, X, Calendar, Clock, Briefcase, Check } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
+import Navbar from "./Navbar";
 
 export default function UpcomingInterviewsPage() {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -136,6 +137,8 @@ const handleMarkAsDone = async (interviewId) => {
   const done = interviews.filter((iv) => iv.done);
 
   return (
+    <>
+    <Navbar/>
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-3xl mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
@@ -435,5 +438,6 @@ const handleMarkAsDone = async (interviewId) => {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -1,10 +1,16 @@
 import { useState } from "react";
 import VoiceAgent from "./VoiceAgent";
 import { Mic, User, Target, Brain, MessageSquare, Star, ArrowRight } from "lucide-react";
+import logo from "./../assets/logo.png"; // imported logo for navbar
+import { NavLink ,useNavigate} from "react-router-dom"; // Added import
+import {  Menu, X,  TrendingUp,  FlaskConical, Briefcase,  BarChart3, Clock, FileText,Zap,Settings,Bell,Calendar,Download, Activity, ListTodo} from 'lucide-react';
+import { UserButton, useUser, useAuth } from "@clerk/clerk-react";
+import Navbar from "./Navbar";
+
 function PractiseSection() {
   const [jobRole, setJobRole] = useState("");
   const [feedback, setFeedback] = useState(null);
-
+ const [isMenuOpen, setIsMenuOpen] = useState(false);
   const features = [
     {
       icon: <MessageSquare className="w-5 h-5" />,
@@ -37,6 +43,10 @@ function PractiseSection() {
   };
 
   return (
+    <>
+    <Navbar />
+
+
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <div className="max-w-6xl mx-auto px-6 py-12">
@@ -218,6 +228,7 @@ function PractiseSection() {
       {/* Voice Agent - Fixed Position */}
       <VoiceAgent jobRole={jobRole} setFeedback={setFeedback} />
     </div>
+    </>
   );
 }
 
