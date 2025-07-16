@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { UserButton, useUser, useAuth } from "@clerk/clerk-react";
 import {  Menu, X, Mic,  TrendingUp,  FlaskConical, Briefcase,  BarChart3, Target, Clock, FileText,ArrowRight,Zap,Settings,Bell,Calendar,Download, Activity, ListTodo} from 'lucide-react';
 import { NavLink ,useNavigate} from "react-router-dom"; // Added import
+import logo from "./../assets/logo.png"; // imported logo for navbar
+import Navbar from './Navbar';
 
 export default function PrepMateHomepage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -101,105 +103,9 @@ export default function PrepMateHomepage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
-      <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <div className="flex-shrink-0 flex items-center">
-              <div className="bg-black text-white p-2 rounded-lg mr-3">
-                <Zap className="w-6 h-6" />
-              </div>
-              <span className="text-2xl font-bold text-black">
-                OmniPrep
-              </span>
-            </div>
-            {/* Desktop Menu */}
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-6">
-                <NavLink to="/home" className="text-black hover:text-gray-700 px-3 py-2 text-sm font-medium transition-colors flex items-center">
-                  <BarChart3 className="w-4 h-4 mr-1" />
-                  Dashboard
-                </NavLink>
-                <NavLink to="/mock-interview" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
-                  <Mic className="w-4 h-4 mr-1" />
-                  Mock Interviews
-                </NavLink>
-                <NavLink to="/practise-section" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
-                  <FlaskConical className="w-4 h-4 mr-1" />
-                  Practice Mode
-                </NavLink>
-                <NavLink to="/job-search" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
-                  <Briefcase className="w-4 h-4 mr-1" />
-                  Job Matching
-                </NavLink>
-                <NavLink to="#" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
-                  <FileText className="w-4 h-4 mr-1" />
-                  Reports
-                </NavLink>
-                <NavLink to="/upcoming-interview" className="text-gray-700 hover:text-black px-3 py-2 text-sm font-medium transition-colors flex items-center">
-                  <ListTodo className="w-4 h-4 mr-1" />
-                  Your Interviews
-                </NavLink>
-              </div>
-            </div>
-            {/* User Profile & Notifications */}
-            <div className="hidden md:block">
-              <div className="flex items-center space-x-4">
-                <Settings className="w-5 h-5 text-gray-700 hover:text-black cursor-pointer" />
-                <UserButton afterSignOutUrl="/sign-in" />
-              </div>
-            </div>
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="bg-gray-100 p-2 rounded-md text-gray-700 hover:text-black hover:bg-gray-200 transition-colors"
-              >
-                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
-            </div>
-          </div>
-        </div>
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <NavLink to="/home" className="text-black block px-3 py-2 text-base font-medium items-center">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Dashboard
-              </NavLink>
-              <NavLink to="/mock-interview" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
-                <Mic className="w-4 h-4 mr-2" />
-                Mock Interviews
-              </NavLink>
-              <NavLink to="/practise-section" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
-                <FlaskConical className="w-4 h-4 mr-2" />
-                Practice Mode
-              </NavLink>
-              <NavLink to="/job-search" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
-                <Briefcase className="w-4 h-4 mr-2" />
-                Job Matching
-              </NavLink>
-              <NavLink to="#" className="text-gray-700 hover:text-black block px-3 py-2 text-base font-medium items-center">
-                <FileText className="w-4 h-4 mr-2" />
-                Reports
-              </NavLink>
-              <div className="border-t pt-4 pb-3">
-                <div className="flex items-center px-3 space-x-3">
-                  <div>
-                    <UserButton/>
-                  </div>
-                  {isSignedIn && user && (
-  <span className="text-sm font-medium text-gray-700">{user.fullName}</span>
- )}
+      <Navbar />
 
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </nav>
-      {/* Main Content */}
+{/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">

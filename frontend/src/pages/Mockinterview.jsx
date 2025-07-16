@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import VoiceAgent2 from './VoiceAgent2';
 import MockinterviewResults from './MockInterviewResult';
-
+import Navbar from './Navbar';
 const Mockinterview = () => {
   const [currentView, setCurrentView] = useState('form');
   const [formData, setFormData] = useState({
@@ -112,6 +112,8 @@ const Mockinterview = () => {
   // FORM VIEW
   // FORM VIEW
 return (
+  <>
+  <Navbar/>  
   <div className="min-h-screen bg-white relative overflow-hidden">
     {/* Background Pattern */}
     <div className="absolute inset-0 opacity-5 pointer-events-none">
@@ -274,6 +276,8 @@ return (
       </form>
     </div>
   </div>
+  </>
+
 );
 
 };

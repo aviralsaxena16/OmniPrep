@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import Navbar from "./Navbar";
 // API fetch function
 async function fetchJobs(params) {
   const query = encodeURIComponent(params.query || "");
@@ -103,6 +103,8 @@ export default function JobSearchApp() {
   };
 
   return (
+    <>
+    <Navbar/>
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       {/* Header */}
       <div className="bg-white/95 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-50">
@@ -355,5 +357,6 @@ export default function JobSearchApp() {
         </div>
       </div>
     </div>
+    </>
   );
 }
