@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, XCircle, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 
-const MockinterviewResults = ({ callId, onBack }) => {
+const MockinterviewResults = ({ clerkId, onBack }) => {
+
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,8 +11,7 @@ const MockinterviewResults = ({ callId, onBack }) => {
   const maxRetries = 5;
   const retryDelay = 5000; // 5 seconds
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-  const fetchUrl = `${backendUrl}/api/interviews/results/${callId}`;
-  // const fetchUrl = `${backendUrl}/api/interviews/results/interview_1752754673567_txqkah33d`;
+const fetchUrl = `${backendUrl}/api/interviews/latest/${clerkId}`;
 
   const formattedDate = (ts) => {
     const date = new Date(Number(ts) || ts);
@@ -20,23 +20,23 @@ const MockinterviewResults = ({ callId, onBack }) => {
 
   // ✅ Fetch results
   const fetchResults = useCallback(async () => {
-    if (!callId) {
-      setLoading(false);
-      setError('No call ID provided.');
-      return false;
-    }
-    console.log(`Attempting to fetch results for Call ID: ${callId}`);
+    if (!clerkId) {
+  setLoading(false);
+  setError('No Clerk ID provided.');
+  return false;
+}
+console.log(`Attempting to fetch latest interview for Clerk ID: ${clerkId}`);
 
     try {
       const response = await fetch(fetchUrl);
       if (response.ok) {
         const data = await response.json();
-        setResults(data);
+        setResults(data.entry);
         setLoading(false);
         console.log("✅ Results fetched:", data);
         return true;
       } else if (response.status === 404) {
-        console.warn(`Results not ready for ${callId} (404)`);
+        console.warn(`Results not ready for ${clerkId} (404)`);
         return false;
       } else {
         throw new Error(`Status: ${response.status}`);
@@ -45,11 +45,11 @@ const MockinterviewResults = ({ callId, onBack }) => {
       console.error(`❌ Fetch error:`, err);
       return false;
     }
-  }, [callId, fetchUrl]);
+  }, [clerkId, fetchUrl]);
 
   // ✅ Retry logic
   useEffect(() => {
-    if (!callId) return;
+    if (!clerkId) return;
 
     let timeoutId;
     const attemptFetch = async () => {
@@ -67,7 +67,7 @@ const MockinterviewResults = ({ callId, onBack }) => {
 
     attemptFetch();
     return () => clearTimeout(timeoutId);
-  }, [callId, retryCount, fetchResults]);
+  }, [clerkId, retryCount, fetchResults]);
 
   // ✅ Reset when new callId
   useEffect(() => {
@@ -75,7 +75,7 @@ const MockinterviewResults = ({ callId, onBack }) => {
     setError(null);
     setLoading(true);
     setRetryCount(0);
-  }, [callId]);
+  }, [clerkId]);
 
   // ✅ Manual Retry
   const handleManualRetry = () => {
@@ -92,7 +92,7 @@ const MockinterviewResults = ({ callId, onBack }) => {
         <Loader2 className="w-16 h-16 text-blue-500 animate-spin mb-4" />
         <h2 className="text-xl text-white mb-2">Processing Interview Results...</h2>
         <p className="text-gray-400 mb-4">
-          Call ID: <span className="font-mono">{callId}</span> <br />
+          {/* Call ID: <span className="font-mono">{callId}</span> <br /> */}
           Attempt {retryCount + 1} of {maxRetries + 1}
         </p>
       </div>
@@ -117,7 +117,7 @@ const MockinterviewResults = ({ callId, onBack }) => {
     return (
       <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
         <AlertCircle className="w-16 h-16 text-yellow-500 mb-4" />
-        <h2 className="text-yellow-400">Results Not Available Yet for {callId}</h2>
+        <h2 className="text-yellow-400">Results Not Available Yet </h2>
         <p className="text-gray-400">
           Could not retrieve results after {maxRetries + 1} attempts.
         </p>

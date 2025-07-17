@@ -1,39 +1,53 @@
-// routes/webhook.js
-import express from 'express';
+import express from "express";
 import {
   storeInterviewResult,
   debugStoreWebhook,
   normalizeResult
-} from './store.js';
+} from "./store.js";
+import Interview from "../models/Interview.js";
 
 const router = express.Router();
 
-router.post('/omnidimension', async (req, res) => {
-  console.log('--- Raw Webhook Body Received ---');
+/* ======================================================
+   ✅ Omnidimension Webhook (Create New Entry Per Interview)
+====================================================== */
+router.post("/omnidimension", async (req, res) => {
+  console.log("--- Raw Webhook Body Received ---");
   console.log(JSON.stringify(req.body, null, 2));
-  console.log('---------------------------------');
+  console.log("---------------------------------");
 
   try {
     const payload = req.body;
     const callId = payload.call_id || payload.callId;
+    const clerkId = payload.clerkId; // ✅ Ensure you pass this when starting the interview
 
-    // ✅ Always debug-store the raw payload for reference
-    debugStoreWebhook(callId || `unknown_${Date.now()}`, payload);
+    // ✅ Always debug-store raw payload
+    await debugStoreWebhook(callId || `unknown_${Date.now()}`, payload);
 
-    if (!callId) {
-      console.error('❌ Missing call_id in webhook payload');
-      return res.status(400).json({ error: 'Missing call_id in request body' });
+    if (!clerkId || !callId) {
+      console.error("❌ Missing clerkId or callId in webhook payload");
+      return res.status(400).json({ error: "Missing clerkId or callId" });
     }
 
-    // ✅ Normalize and store
+    // ✅ Normalize data for storage
     const normalized = normalizeResult(payload);
-    storeInterviewResult(normalized.callId, normalized);
 
-    console.log(`✅ Successfully stored interview result for callId: ${normalized.callId}`);
-    res.status(200).json({ message: '✅ Webhook processed successfully!' });
+    // ✅ CREATE a new entry (not update)
+    const newInterview = await Interview.create({
+      clerkId,
+      callId,
+      ...normalized,
+      createdAt: new Date()
+    });
+
+    // ✅ (Optional: old local storage)
+    storeInterviewResult(callId, normalized);
+
+    console.log(`✅ Interview saved for Clerk ID: ${clerkId}, Call ID: ${callId}`);
+    res.status(201).json({ message: "✅ Interview saved successfully!", entry: newInterview });
   } catch (err) {
-    console.error('❌ Webhook processing error:', err);
-    res.status(500).json({ error: 'Internal server error while processing webhook' });
+    console.error("❌ Webhook processing error:", err);
+    res.status(500).json({ error: "Internal server error while processing webhook" });
   }
 });
 

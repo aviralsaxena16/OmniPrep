@@ -3,10 +3,12 @@ import express from 'express';
 import cors from 'cors';
 import cron from 'node-cron';
 import { connectDB, closeDB } from './db.js';
+import { requireAuth } from "@clerk/express"; // ✅ Clerk middleware
 import userRoutes from './routes/user.js';
 import webhookRoutes from './routes/webhook.js';
 import interviewRoutes from './routes/interview.js';
 import User from './models/User.js';
+import Interview from './models/Interview.js'; // ✅ Added for storing call start data
 
 const app = express();
 
@@ -35,7 +37,9 @@ app.use(
 // ✅ Connect to DB
 connectDB();
 
-// ✅ Interview Reminder Logic
+/* ======================================================
+   🔔 Interview Reminder Logic
+====================================================== */
 const activeNotifications = new Map();
 cron.schedule('* * * * *', async () => {
   try {
@@ -67,7 +71,6 @@ cron.schedule('* * * * *', async () => {
   }
 });
 
-// ✅ Notification Routes
 app.get('/api/notifications/:email', (req, res) => {
   const { email } = req.params;
   const userNotifications = [];
@@ -117,7 +120,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// ✅ Test API
 app.get('/api/test', (req, res) => {
   res.json({
     message: 'API is working',
@@ -125,9 +127,12 @@ app.get('/api/test', (req, res) => {
   });
 });
 
-// ✅ Start OmniDimension Call
-app.post('/api/start-omnidimension-call', async (req, res) => {
+/* ======================================================
+   ✅ Start OmniDimension Call (Clerk Protected)
+====================================================== */
+app.post('/api/start-omnidimension-call', requireAuth(), async (req, res) => {
   try {
+    const clerkId = req.auth.userId; // ✅ Get Clerk user ID
     const { call_id, name, education, experience, job_role, company_name } = req.body;
 
     if (!process.env.OMNIDIMENSION_API_KEY || !process.env.OMNIDIMENSION_SECRET_KEY) {
@@ -138,10 +143,11 @@ app.post('/api/start-omnidimension-call', async (req, res) => {
       return res.status(400).json({ error: 'call_id and name are required' });
     }
 
+    // ✅ Start Omni Call
     const omniRes = await axios.post(
       'https://api.omnidim.io/api/v1/call/start',
       {
-        secret_key: process.env.OMNIDIMENSION_SECRET_KEY, // ✅ Correct Key
+        secret_key: process.env.OMNIDIMENSION_SECRET_KEY,
         call_type: 'web_call',
         custom_data: {
           call_id,
@@ -159,6 +165,14 @@ app.post('/api/start-omnidimension-call', async (req, res) => {
         }
       }
     );
+
+    // ✅ Save initial interview doc for mapping ClerkId <-> CallId
+    await Interview.create({
+      clerkId,
+      callId: call_id,
+      interviewData: {}, // will be filled after webhook
+      createdAt: new Date(),
+    });
 
     res.status(200).json({
       success: true,
