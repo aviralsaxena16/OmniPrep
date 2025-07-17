@@ -8,41 +8,53 @@ import {
 
 const router = express.Router();
 
-// GET single result
+// ✅ Helper: normalize keys (snake_case → camelCase)
+const normalizeResult = (payload) => {
+  return {
+    callId: payload.call_id || payload.callId,
+    extractedInfo: payload.extracted_info || payload.extractedInfo || {},
+    fullConversation: payload.full_conversation || payload.fullConversation || '',
+    timestamp: payload.timestamp || Date.now()
+  };
+};
+
+// ✅ GET single result
 router.get('/results/:callId', (req, res) => {
   const { callId } = req.params;
   const result = getInterviewResult(callId);
 
+  console.log(`🔍 Fetching results for Call ID: ${callId}`, result);
+
   if (result) {
-    res.json(result);
+    return res.json(result);
   } else {
-    res.status(404).json({ error: 'Interview results not found for this call ID.' });
+    return res.status(404).json({ error: `Interview results not found for Call ID: ${callId}` });
   }
 });
 
-// GET all results (optional/admin)
+// ✅ GET all results (optional/admin/debugging)
 router.get('/results', (req, res) => {
-  res.json(getAllInterviewResults());
+  const allResults = getAllInterviewResults();
+  console.log(`📦 Returning all stored interview results:`, allResults);
+  res.json(allResults);
 });
 
-// POST new result (webhook)
+// ✅ POST new result (webhook/manual input)
 router.post('/results', (req, res) => {
   try {
-    const { callId, extractedInfo, fullConversation, timestamp } = req.body;
+    const normalized = normalizeResult(req.body);
 
-    if (!callId) {
+    if (!normalized.callId) {
       return res.status(400).json({ error: 'Missing callId in request body' });
     }
 
-    const result = {
-      callId,
-      extractedInfo,
-      fullConversation,
-      timestamp: timestamp || new Date().toISOString(),
-    };
+    storeInterviewResult(normalized.callId, normalized);
 
-    storeInterviewResult(callId, result);
-    res.status(200).json({ message: 'Result stored successfully' });
+    console.log(`✅ Stored interview result for Call ID: ${normalized.callId}`);
+    res.status(200).json({
+      message: 'Result stored successfully',
+      stored: normalized
+    });
   } catch (error) {
     console.error('❌ Error storing interview result:', error);
     res.status(500).json({ error: 'Failed to store interview result' });
