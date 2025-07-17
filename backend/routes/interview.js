@@ -4,14 +4,13 @@ import Interview from "../models/Interview.js";
 const router = express.Router();
 
 /* ======================================================
-   ✅ 1. Fetch Latest Interview for a User (Clerk Based)
+   ✅ 1. Fetch Latest Interview for a User
 ====================================================== */
 router.get("/latest/:clerkId", async (req, res) => {
   try {
     const { clerkId } = req.params;
 
     const latestEntry = await Interview.findOne({ clerkId }).sort({ createdAt: -1 });
-
     if (!latestEntry) {
       return res.status(404).json({ success: false, message: "No interview found" });
     }
@@ -24,19 +23,20 @@ router.get("/latest/:clerkId", async (req, res) => {
 });
 
 /* ======================================================
-   ✅ 2. Save Interview (Used After Call Completion)
+   ✅ 2. Debug-Only: Manually Save Interview
 ====================================================== */
 router.post("/save", async (req, res) => {
   try {
-    const { clerkId, interviewData } = req.body;
+    const { clerkId, callId, interviewData } = req.body;
 
-    if (!clerkId || !interviewData) {
+    if (!clerkId || !callId || !interviewData) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
     const newEntry = await Interview.create({
       clerkId,
-      ...interviewData, // directly spread AI-generated interview results
+      callId,
+      interviewData,
       createdAt: new Date(),
     });
 
@@ -48,7 +48,7 @@ router.post("/save", async (req, res) => {
 });
 
 /* ======================================================
-   ✅ 3. Fetch All Interviews (Admin/Debugging)
+   ✅ 3. Fetch All Interviews (Admin/Debug)
 ====================================================== */
 router.get("/all", async (req, res) => {
   try {

@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import VoiceAgent2 from './VoiceAgent2';
 import MockinterviewResults from './MockInterviewResult';
 import Navbar from './Navbar';
-
-const Mockinterview = ({ clerkId }) => {
+import { useUser } from "@clerk/clerk-react"; 
+const Mockinterview = () => {
+  const { user } = useUser();
+  const clerkId=user?.id;
   const [currentView, setCurrentView] = useState('form');
   const [formData, setFormData] = useState({
     name: '',

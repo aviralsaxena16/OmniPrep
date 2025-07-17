@@ -5,13 +5,14 @@ import {
   normalizeResult
 } from "./store.js";
 import Interview from "../models/Interview.js";
+import { requireAuth } from "@clerk/express";
 
 const router = express.Router();
 
 /* ======================================================
-   ✅ Omnidimension Webhook (Create New Entry Per Interview)
+   ✅ OmniDimension Webhook → Creates New Interview Entry
 ====================================================== */
-router.post("/omnidimension", async (req, res) => {
+router.post("/omnidimension", requireAuth(), async (req, res) => {
   console.log("--- Raw Webhook Body Received ---");
   console.log(JSON.stringify(req.body, null, 2));
   console.log("---------------------------------");
@@ -19,9 +20,9 @@ router.post("/omnidimension", async (req, res) => {
   try {
     const payload = req.body;
     const callId = payload.call_id || payload.callId;
-    const clerkId = payload.clerkId; // ✅ Ensure you pass this when starting the interview
+    const clerkId = req.auth.userId; // ✅ Clerk-provided authenticated user
 
-    // ✅ Always debug-store raw payload
+    // ✅ Debug-store for inspection
     await debugStoreWebhook(callId || `unknown_${Date.now()}`, payload);
 
     if (!clerkId || !callId) {
@@ -29,18 +30,18 @@ router.post("/omnidimension", async (req, res) => {
       return res.status(400).json({ error: "Missing clerkId or callId" });
     }
 
-    // ✅ Normalize data for storage
+    // ✅ Normalize AI response for storage
     const normalized = normalizeResult(payload);
 
-    // ✅ CREATE a new entry (not update)
+    // ✅ CREATE a NEW entry (never update existing)
     const newInterview = await Interview.create({
       clerkId,
       callId,
-      ...normalized,
+      interviewData: normalized,
       createdAt: new Date()
     });
 
-    // ✅ (Optional: old local storage)
+    // (Optional local storage for debugging)
     storeInterviewResult(callId, normalized);
 
     console.log(`✅ Interview saved for Clerk ID: ${clerkId}, Call ID: ${callId}`);

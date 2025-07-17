@@ -49,7 +49,7 @@ function VoiceAgent2({ name, education, experience, jobRole, companyName, clerkI
   // ✅ Save interview result when session ends
   const saveInterviewResult = async (interviewData) => {
     try {
-      const res = await fetch(`${backendUrl}/api/interviews/saveInterview`, {
+      const res = await fetch(`${backendUrl}/api/interviews/save`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
