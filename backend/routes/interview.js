@@ -10,8 +10,18 @@ import {
 const router = express.Router();
 
 // ✅ GET single result
+// ✅ GET single result
 router.get("/results/:callId", (req, res) => {
-  const { callId } = req.params;
+  let { callId } = req.params;
+
+  // ✅ Convert frontend-style "interview_xxx" to numeric callId
+  if (callId.startsWith("interview_")) {
+    const parts = callId.split("_");
+    if (!isNaN(parts[1])) {
+      callId = parts[1]; // Use the numeric part only (e.g., "44324")
+    }
+  }
+
   const result = getInterviewResult(callId);
 
   console.log(`🔍 Fetching results for Call ID: ${callId}`, result);
