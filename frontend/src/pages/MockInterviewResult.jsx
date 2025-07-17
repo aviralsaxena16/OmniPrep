@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, CheckCircle, XCircle, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
+import { ArrowLeft, XCircle, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 
 const MockinterviewResults = ({ callId, onBack }) => {
   const [results, setResults] = useState(null);
@@ -10,8 +10,8 @@ const MockinterviewResults = ({ callId, onBack }) => {
   const maxRetries = 5;
   const retryDelay = 5000; // 5 seconds
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-  // const fetchUrl = `${backendUrl}/api/interviews/results/${callId}`;
-  const fetchUrl = `${backendUrl}/api/interviews/results/interview_1752742568471_u07cloilg`;
+  const fetchUrl = `${backendUrl}/api/interviews/results/${callId}`;
+  // const fetchUrl = `${backendUrl}/api/interviews/results/interview_1752754673567_txqkah33d`;
 
   const formattedDate = (ts) => {
     const date = new Date(Number(ts) || ts);
@@ -43,7 +43,7 @@ const MockinterviewResults = ({ callId, onBack }) => {
       }
     } catch (err) {
       console.error(`❌ Fetch error:`, err);
-      return false; // Don't setError yet, wait for retries
+      return false;
     }
   }, [callId, fetchUrl]);
 
@@ -85,7 +85,7 @@ const MockinterviewResults = ({ callId, onBack }) => {
     setError(null);
   };
 
-  // ✅ UI
+  // ✅ UI States
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
@@ -129,7 +129,8 @@ const MockinterviewResults = ({ callId, onBack }) => {
   }
 
   // ✅ Display Results
-  const { extractedInfo, fullConversation, timestamp } = results;
+  const { extractedInfo, fullConversation, timestamp, summary, sentiment, recordingUrl } = results;
+
   return (
     <div className="min-h-screen bg-gray-900 p-6">
       <div className="max-w-4xl mx-auto bg-gray-800 p-8 rounded-lg border border-gray-700">
@@ -138,6 +139,40 @@ const MockinterviewResults = ({ callId, onBack }) => {
         </button>
         <h1 className="text-2xl text-white">Interview Results</h1>
         <p className="text-green-300 mt-2">Completed on {formattedDate(timestamp)}</p>
+
+        {summary && (
+          <div className="mt-4">
+            <h3 className="text-lg text-blue-300 mb-2">Summary</h3>
+            <p className="text-gray-300">{summary}</p>
+          </div>
+        )}
+
+        {sentiment && (
+          <div className="mt-4">
+            <h3 className="text-lg text-blue-300 mb-2">Sentiment</h3>
+            <p className={`text-${sentiment === 'Positive'
+              ? 'green'
+              : sentiment === 'Negative'
+              ? 'red'
+              : 'yellow'}-400`}>
+              {sentiment}
+            </p>
+          </div>
+        )}
+
+        {recordingUrl && (
+          <div className="mt-4">
+            <h3 className="text-lg text-blue-300 mb-2">Recording</h3>
+            <a
+              href={recordingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 underline"
+            >
+              Listen to Recording
+            </a>
+          </div>
+        )}
 
         {extractedInfo && (
           <div className="mt-6">

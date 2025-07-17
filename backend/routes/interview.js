@@ -1,25 +1,16 @@
-// routes/interviewResults.js
-import express from 'express';
+// routes/interview.js
+import express from "express";
 import {
   storeInterviewResult,
   getInterviewResult,
-  getAllInterviewResults
-} from './store.js';
+  getAllInterviewResults,
+  normalizeResult, // ✅ Reuse global normalizeResult
+} from "../store.js";
 
 const router = express.Router();
 
-// ✅ Helper: normalize keys (snake_case → camelCase)
-const normalizeResult = (payload) => {
-  return {
-    callId: payload.call_id || payload.callId,
-    extractedInfo: payload.extracted_info || payload.extractedInfo || {},
-    fullConversation: payload.full_conversation || payload.fullConversation || '',
-    timestamp: payload.timestamp || Date.now()
-  };
-};
-
 // ✅ GET single result
-router.get('/results/:callId', (req, res) => {
+router.get("/results/:callId", (req, res) => {
   const { callId } = req.params;
   const result = getInterviewResult(callId);
 
@@ -28,36 +19,44 @@ router.get('/results/:callId', (req, res) => {
   if (result) {
     return res.json(result);
   } else {
-    return res.status(404).json({ error: `Interview results not found for Call ID: ${callId}` });
+    return res
+      .status(404)
+      .json({ error: `Interview results not found for Call ID: ${callId}` });
   }
 });
 
 // ✅ GET all results (optional/admin/debugging)
-router.get('/results', (req, res) => {
+router.get("/results", (req, res) => {
   const allResults = getAllInterviewResults();
   console.log(`📦 Returning all stored interview results:`, allResults);
   res.json(allResults);
 });
 
 // ✅ POST new result (webhook/manual input)
-router.post('/results', (req, res) => {
+router.post("/results", (req, res) => {
   try {
     const normalized = normalizeResult(req.body);
 
     if (!normalized.callId) {
-      return res.status(400).json({ error: 'Missing callId in request body' });
+      return res
+        .status(400)
+        .json({ error: "Missing callId in request body" });
     }
 
     storeInterviewResult(normalized.callId, normalized);
 
-    console.log(`✅ Stored interview result for Call ID: ${normalized.callId}`);
+    console.log(
+      `✅ Stored interview result for Call ID: ${normalized.callId}`,
+      normalized
+    );
+
     res.status(200).json({
-      message: 'Result stored successfully',
-      stored: normalized
+      message: "Result stored successfully",
+      stored: normalized,
     });
   } catch (error) {
-    console.error('❌ Error storing interview result:', error);
-    res.status(500).json({ error: 'Failed to store interview result' });
+    console.error("❌ Error storing interview result:", error);
+    res.status(500).json({ error: "Failed to store interview result" });
   }
 });
 
