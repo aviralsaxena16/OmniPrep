@@ -1,10 +1,12 @@
 import axios from 'axios';
 import express from 'express';
 import cors from 'cors';
+import cron from 'node-cron';
 import { connectDB, closeDB } from './db.js';
 import userRoutes from './routes/user.js';
 import webhookRoutes from './routes/webhook.js'; 
 import interviewRoutes from './routes/interview.js';
+import User from './models/User.js';
 
 const app = express();
 
@@ -23,6 +25,68 @@ app.use(cors({
 // Connect to DB
 connectDB();
 
+// Store for active notifications
+const activeNotifications = new Map();
+
+// Check for interviews every minute
+cron.schedule('* * * * *', async () => {
+  try {
+    const users = await User.find({});
+    const now = new Date();
+    
+    for (const user of users) {
+      for (const interview of user.upcomingInterviews) {
+        if (interview.done) continue;
+        
+        const interviewDateTime = new Date(`${interview.interviewDate.toISOString().split('T')[0]}T${interview.interviewTime}:00`);
+        const timeDiff = interviewDateTime - now;
+        const twoMinutes = 2 * 60 * 1000;
+        
+        // Check if interview is 2 minutes away (±30 seconds tolerance)
+        if (timeDiff > (twoMinutes - 30000) && timeDiff < (twoMinutes + 30000)) {
+          const notificationId = `${user.email}-${interview._id}`;
+          
+          if (!activeNotifications.has(notificationId)) {
+            activeNotifications.set(notificationId, {
+              email: user.email,
+              interview: interview,
+              timestamp: now
+            });
+            console.log(`🔔 Interview notification ready for ${user.email}: ${interview.company} - ${interview.jobRole}`);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error checking interviews:', error);
+  }
+});
+
+// Get pending notifications for a user
+app.get('/api/notifications/:email', (req, res) => {
+  const { email } = req.params;
+  const userNotifications = [];
+  
+  for (const [notificationId, data] of activeNotifications) {
+    if (data.email === email) {
+      userNotifications.push({
+        id: notificationId,
+        interview: data.interview,
+        timestamp: data.timestamp
+      });
+    }
+  }
+  
+  res.json(userNotifications);
+});
+
+// Clear notification after user clicks
+app.delete('/api/notifications/:notificationId', (req, res) => {
+  const { notificationId } = req.params;
+  activeNotifications.delete(notificationId);
+  res.json({ success: true });
+});
+
 // Logging middleware
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -35,7 +99,7 @@ app.use((req, res, next) => {
 // Routes
 app.use("/", userRoutes);
 app.use("/api/interviews", interviewRoutes);
-app.use("/api/webhooks", webhookRoutes); // ✅
+app.use("/api/webhooks", webhookRoutes);
 
 app.get('/health', (req, res) => {
   res.status(200).json({ 

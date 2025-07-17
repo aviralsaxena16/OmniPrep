@@ -8,10 +8,11 @@ import JobSearch from "./pages/JobSearch";
 import PractiseSection from "./pages/PractiseSection";
 import Mockinterview from "./pages/Mockinterview";
 import UpcomingInterviewsPage from "./pages/UpcomingInterview";
-
+import NotificationHandler from "./pages/NotificationHandler";
 function App() {
   return (
     <Router>
+       <NotificationHandler /> 
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/practise-section" element={<PractiseSection />} />
