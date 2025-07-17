@@ -5,7 +5,7 @@ import {
   getInterviewResult,
   getAllInterviewResults,
   normalizeResult, // ✅ Reuse global normalizeResult
-} from "../store.js";
+} from "./store.js";
 
 const router = express.Router();
 

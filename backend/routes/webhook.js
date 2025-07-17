@@ -4,7 +4,7 @@ import {
   storeInterviewResult,
   debugStoreWebhook,
   normalizeResult
-} from '../store.js';
+} from './store.js';
 
 const router = express.Router();
 
