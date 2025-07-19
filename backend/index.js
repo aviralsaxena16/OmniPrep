@@ -112,7 +112,7 @@ app.get('/health', (req, res) => {
 ====================================================== */
 app.post('/api/start-omnidimension-call', async (req, res) => {
   try {
-    const { name, education, experience, job_role, company_name } = req.body;
+    const { callId,name, education, experience, job_role, company_name } = req.body;
 
     
 
@@ -120,7 +120,7 @@ app.post('/api/start-omnidimension-call', async (req, res) => {
       return res.status(500).json({ error: 'OmniDimension credentials are missing' });
     }
 
-    const callId = `call_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    // const callId = `call_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
     const omniRes = await axios.post(
       'https://api.omnidim.io/api/v1/call/start',
