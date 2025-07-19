@@ -9,6 +9,10 @@ import PractiseSection from "./pages/PractiseSection";
 import Mockinterview from "./pages/Mockinterview";
 import UpcomingInterviewsPage from "./pages/UpcomingInterview";
 import NotificationHandler from "./pages/NotificationHandler";
+import Reports from './pages/Reports';
+
+// Add this route
+
 function App() {
   return (
     <Router>
@@ -18,7 +22,7 @@ function App() {
         <Route path="/practise-section" element={<PractiseSection />} />
         <Route path="/mock-interview" element={<Mockinterview />} />
         <Route path="/job-search" element={<JobSearch />} />
-
+                 <Route path="/reports" element={<Reports />} />
         <Route 
           path="/sign-in" 
           element={

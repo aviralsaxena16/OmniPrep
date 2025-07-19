@@ -43,7 +43,7 @@ export default function Navbar() {
                 <Briefcase className="w-4 h-4 mr-1" />
                 Job Matching
               </NavLink>
-              <NavLink to="#" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors flex items-center">
+              <NavLink to="/reports" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors flex items-center">
                 <FileText className="w-4 h-4 mr-1" />
                 Reports
               </NavLink>

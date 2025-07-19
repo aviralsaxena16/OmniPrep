@@ -63,4 +63,14 @@ export const debugStoreWebhook = (callId, rawData) => {
  */
 export const getAllWebhooks = () => allWebhooks;
 
-export { interviewResultsStore, allWebhooks };
+//export { interviewResultsStore, allWebhooks };
+export default {
+  interviewResultsStore,
+  allWebhooks,
+  normalizeResult,
+  storeInterviewResult,
+  getInterviewResult,
+  getAllInterviewResults,
+  debugStoreWebhook,
+  getAllWebhooks
+};
