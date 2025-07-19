@@ -15,7 +15,6 @@ const app = express();
 /* ======================================================
    ✅ Middleware & Config
 ====================================================== */
-// ✅ Raw body only for OmniDimension webhook verification
 app.use(
   express.json({
     verify: (req, res, buf) => {
@@ -27,7 +26,6 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ CORS
 app.use(
   cors({
     origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -37,11 +35,10 @@ app.use(
   })
 );
 
-// ✅ DB Connect
 connectDB();
 
 /* ======================================================
-   🔔 Interview Reminder Logic (unchanged)
+   🔔 Interview Reminder Logic
 ====================================================== */
 const activeNotifications = new Map();
 cron.schedule('* * * * *', async () => {
@@ -74,7 +71,6 @@ cron.schedule('* * * * *', async () => {
   }
 });
 
-// ✅ Notification Endpoints
 app.get('/api/notifications/:email', (req, res) => {
   const { email } = req.params;
   const userNotifications = [];
@@ -91,8 +87,7 @@ app.get('/api/notifications/:email', (req, res) => {
 });
 
 app.delete('/api/notifications/:notificationId', (req, res) => {
-  const { notificationId } = req.params;
-  activeNotifications.delete(notificationId);
+  activeNotifications.delete(req.params.notificationId);
   res.json({ success: true });
 });
 
@@ -113,85 +108,55 @@ app.get('/health', (req, res) => {
 });
 
 /* ======================================================
-   ✅ Start OmniDimension Call (Clerk Protected)
+   ✅ Start OmniDimension Call (Simplified for Clerk ID flow)
 ====================================================== */
-app.post('/api/start-omnidimension-call', requireAuth(), async (req, res) => {
+app.post('/api/start-omnidimension-call', async (req, res) => {
   try {
-    const clerkId = req.auth.userId;
-    const { call_id, name, education, experience, job_role, company_name } = req.body;
+    const { name, education, experience, job_role, company_name, clerkId } = req.body;
+
+    if (!clerkId) {
+      return res.status(400).json({ error: 'Clerk ID is required' });
+    }
 
     if (!process.env.OMNIDIMENSION_API_KEY || !process.env.OMNIDIMENSION_SECRET_KEY) {
       return res.status(500).json({ error: 'OmniDimension credentials are missing' });
     }
-    if (!call_id || !name) {
-      return res.status(400).json({ error: 'call_id and name are required' });
-    }
 
-    // ✅ Start Omni Call
+    const callId = `call_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
     const omniRes = await axios.post(
       'https://api.omnidim.io/api/v1/call/start',
       {
         secret_key: process.env.OMNIDIMENSION_SECRET_KEY,
         call_type: 'web_call',
-        custom_data: { call_id, name, education, experience, job_role, company_name }
+        custom_data: { call_id: callId, name, education, experience, job_role, company_name },
       },
       {
         headers: {
           Authorization: `Bearer ${process.env.OMNIDIMENSION_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       }
     );
 
-    // ✅ Save mapping (Clerk ↔ Call)
     await Interview.create({
       clerkId,
-      callId: call_id,
+      callId,
       interviewData: {},
     });
 
     res.status(200).json({
       success: true,
       message: 'OmniDimension call started successfully',
-      data: omniRes.data
+      data: omniRes.data,
     });
   } catch (error) {
     console.error('❌ Error starting OmniDimension call:', error?.response?.data || error.message);
     res.status(error?.response?.status || 500).json({
       success: false,
       error: error?.response?.data?.error || 'Unknown error',
-      message: error.message
+      message: error.message,
     });
-  }
-});
-
-// ✅ Update Call ID after Omni starts
-app.post('/api/update-callid', async (req, res) => {
-  try {
-    const { oldCallId, newCallId } = req.body;
-
-    if (!oldCallId || !newCallId) {
-      return res.status(400).json({ success: false, message: "Both oldCallId and newCallId are required" });
-    }
-
-    const updatedInterview = await Interview.findOneAndUpdate(
-      { callId: oldCallId },
-      { callId: newCallId },
-      { new: true }
-    );
-
-    if (!updatedInterview) {
-      return res.status(404).json({ success: false, message: "No interview found with oldCallId" });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "Call ID updated successfully",
-      entry: updatedInterview
-    });
-  } catch (error) {
-    console.error("❌ Error updating callId:", error);
-    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
@@ -216,7 +181,6 @@ const server = app.listen(PORT, () => {
   console.log(`✅ Health check: http://localhost:${PORT}/health`);
 });
 
-// ✅ Graceful Shutdown
 const shutdown = () => {
   console.log('🛑 Shutdown signal received, closing server');
   server.close(() => {

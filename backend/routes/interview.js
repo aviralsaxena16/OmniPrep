@@ -4,50 +4,53 @@ import Interview from "../models/Interview.js";
 const router = express.Router();
 
 /* ======================================================
-   ✅ 1. Fetch Latest Interview for a User
+   ✅ 1. Fetch Latest Interview (Global Latest Entry)
 ====================================================== */
-router.get("/latest/:clerkId", async (req, res) => {
+router.get("/latest", async (req, res) => {
   try {
-    const { clerkId } = req.params;
+    const interview = await Interview.findOne()
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .lean();
 
-    if (!clerkId) {
-      return res.status(400).json({ success: false, message: "Clerk ID is required" });
+    if (!interview || !interview.interviewData) {
+      return res.status(404).json({ error: "No interviews found" });
     }
 
-    const latestEntry = await Interview.findOne({ clerkId })
-      .sort({ updatedAt: -1, createdAt: -1 });
+    const data = interview.interviewData;
 
-    if (!latestEntry) {
-      return res.status(404).json({
-        success: false,
-        message: "No interview found",
-        entry: null
-      });
-    }
-
-    res.status(200).json({ success: true, entry: latestEntry });
-  } catch (error) {
-    console.error("❌ Error fetching latest interview:", error);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(200).json({
+      entry: {
+        fullConversation: data.fullConversation || "",
+        summary: data.summary || "",
+        sentiment: data.sentiment || "Neutral",
+        recordingUrl: data.recordingUrl || "",
+        timestamp: data.timestamp || interview.updatedAt || interview.createdAt,
+        extractedInfo: data.extractedInfo || {}
+      }
+    });
+  } catch (err) {
+    console.error("❌ Error fetching latest interview:", err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
 /* ======================================================
-   ✅ 2. Debug / Manual Save or Update Interview
+   ✅ 2. Save or Update Interview (Using Call ID)
 ====================================================== */
 router.post("/save", async (req, res) => {
   try {
-    const { clerkId, callId, interviewData } = req.body;
+    const { callId, interviewData } = req.body;
 
     if (!callId || !interviewData) {
-      return res.status(400).json({ success: false, message: "callId and interviewData are required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "callId and interviewData are required" });
     }
 
     const updatedEntry = await Interview.findOneAndUpdate(
       { callId },
       {
         $set: {
-          ...(clerkId && { clerkId }), // only overwrite if provided
           interviewData,
           updatedAt: new Date()
         }
@@ -67,7 +70,7 @@ router.post("/save", async (req, res) => {
 });
 
 /* ======================================================
-   ✅ 3. Fetch All Interviews (Admin/Debug)
+   ✅ 3. Fetch All Interviews (For Debug Only)
 ====================================================== */
 router.get("/all", async (req, res) => {
   try {
@@ -75,12 +78,9 @@ router.get("/all", async (req, res) => {
       return res.status(403).json({ success: false, message: "Forbidden in production" });
     }
 
-    const { clerkId, callId } = req.query;
-    const filter = {};
-    if (clerkId) filter.clerkId = clerkId;
-    if (callId) filter.callId = callId;
-
-    const allEntries = await Interview.find(filter).sort({ updatedAt: -1, createdAt: -1 });
+    const allEntries = await Interview.find({})
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .lean();
 
     res.status(200).json({
       success: true,

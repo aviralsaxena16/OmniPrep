@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import VoiceAgent2 from './VoiceAgent2';
 import MockinterviewResults from './MockInterviewResult';
 import Navbar from './Navbar';
-import { useUser } from "@clerk/clerk-react"; 
+
 const Mockinterview = () => {
-  const { user } = useUser();
-  const clerkId=user?.id;
   const [currentView, setCurrentView] = useState('form');
   const [formData, setFormData] = useState({
     name: '',
@@ -15,45 +13,31 @@ const Mockinterview = () => {
     companyName: ''
   });
 
-  // ✅ Removed callId, we now rely only on clerkId for results fetching
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const requiredFields = ['name', 'education', 'experience', 'jobRole', 'companyName'];
-  const isValid = requiredFields.every(field => formData[field].trim() !== '');
-  if (!isValid) return alert('Please fill in all required fields');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const requiredFields = ['name', 'education', 'experience', 'jobRole', 'companyName'];
+    const isValid = requiredFields.every(field => formData[field].trim() !== '');
+    if (!isValid) return alert('Please fill in all required fields');
 
-  try {
-    // ✅ Generate a unique callId (frontend)
-    const callId = `call_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    try {
+      await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/start-omnidimension-call`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData) // ✅ Only sending form data, no clerkId/callId
+      });
 
-    // ✅ Save mapping in backend before starting interview
-    await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/start-omnidimension-call`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem("__session") || ""}` // Clerk provides session token
-      },
-      body: JSON.stringify({
-        call_id: callId,
-        clerkId,
-        ...formData
-      })
-    });
-
-    console.log(`✅ ClerkId ${clerkId} mapped to CallId ${callId}`);
-    setCurrentView('interview');
-  } catch (err) {
-    console.error("❌ Failed to start interview:", err);
-    alert("Error starting interview. Please try again.");
-  }
-};
-
+      console.log("✅ Interview session started");
+      setCurrentView('interview');
+    } catch (err) {
+      console.error("❌ Failed to start interview:", err);
+      alert("Error starting interview. Please try again.");
+    }
+  };
 
   const handleReset = () => {
     setFormData({ name: '', education: '', experience: '', jobRole: '', companyName: '' });
@@ -64,12 +48,12 @@ const handleSubmit = async (e) => {
   const handleBackToForm = () => setCurrentView('form');
 
   const handleInterviewComplete = () => {
-    // ✅ Now we don't need to pass callId, just switch to results after delay
+    // ✅ No callId; just switch to results after a delay
     setTimeout(() => setCurrentView('results'), 3000);
   };
 
   if (currentView === 'results') {
-    return <MockinterviewResults clerkId={clerkId} onBack={handleBackToForm} />;
+    return <MockinterviewResults onBack={handleBackToForm} />;
   }
 
   if (currentView === 'interview') {
@@ -125,7 +109,6 @@ const handleSubmit = async (e) => {
 
             <VoiceAgent2
               {...formData}
-              clerkId={clerkId} // ✅ pass clerkId instead of callId
               onInterviewComplete={handleInterviewComplete}
             />
           </div>
@@ -193,6 +176,7 @@ const handleSubmit = async (e) => {
             </div>
           </div>
 
+          {/* Form */}
           <h1 className="text-4xl font-bold text-black mb-4">Submit</h1>
           <form
             onSubmit={handleSubmit}

@@ -1,28 +1,18 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const InterviewSchema = new mongoose.Schema(
+const interviewSchema = new mongoose.Schema(
   {
-    clerkId: {
-      type: String,
-      required: true,
-      index: true, // ✅ Fast lookup by clerkId
-    },
-    callId: {
-      type: String,
-      required: true,
-      unique: true, // ✅ Prevent duplicate webhook updates for same call
-      index: true,  // ✅ Speeds up updates via callId
-    },
+    callId: { type: String, required: true, unique: true }, // still required for mapping webhook updates
     interviewData: {
-      type: Object,
-      default: {},
-    },
+      fullConversation: String,
+      summary: String,
+      sentiment: String,
+      recordingUrl: String,
+      timestamp: Date,
+      extractedInfo: { type: mongoose.Schema.Types.Mixed, default: {} }
+    }
   },
-  { timestamps: true } // ✅ Adds createdAt & updatedAt
+  { timestamps: true }
 );
 
-// ✅ Compound index for faster "latest interview" queries
-InterviewSchema.index({ clerkId: 1, updatedAt: -1 });
-
-const Interview = mongoose.model("Interview", InterviewSchema);
-export default Interview;
+export default mongoose.model("Interview", interviewSchema);

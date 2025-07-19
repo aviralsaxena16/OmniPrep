@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, XCircle, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 
-const MockinterviewResults = ({ clerkId, onBack }) => {
-
+const MockinterviewResults = ({ onBack }) => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -11,7 +10,7 @@ const MockinterviewResults = ({ clerkId, onBack }) => {
   const maxRetries = 5;
   const retryDelay = 5000; // 5 seconds
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-const fetchUrl = `${backendUrl}/api/interviews/latest/${clerkId}`;
+  const fetchUrl = `${backendUrl}/api/interviews/latest`;
 
   const formattedDate = (ts) => {
     const date = new Date(Number(ts) || ts);
@@ -20,13 +19,7 @@ const fetchUrl = `${backendUrl}/api/interviews/latest/${clerkId}`;
 
   // ✅ Fetch results
   const fetchResults = useCallback(async () => {
-    if (!clerkId) {
-  setLoading(false);
-  setError('No Clerk ID provided.');
-  return false;
-}
-console.log(`Attempting to fetch latest interview for Clerk ID: ${clerkId}`);
-
+    console.log(`Attempting to fetch latest interview results...`);
     try {
       const response = await fetch(fetchUrl);
       if (response.ok) {
@@ -36,7 +29,7 @@ console.log(`Attempting to fetch latest interview for Clerk ID: ${clerkId}`);
         console.log("✅ Results fetched:", data);
         return true;
       } else if (response.status === 404) {
-        console.warn(`Results not ready for ${clerkId} (404)`);
+        console.warn("Results not ready yet (404)");
         return false;
       } else {
         throw new Error(`Status: ${response.status}`);
@@ -45,16 +38,13 @@ console.log(`Attempting to fetch latest interview for Clerk ID: ${clerkId}`);
       console.error(`❌ Fetch error:`, err);
       return false;
     }
-  }, [clerkId, fetchUrl]);
+  }, [fetchUrl]);
 
   // ✅ Retry logic
   useEffect(() => {
-    if (!clerkId) return;
-
     let timeoutId;
     const attemptFetch = async () => {
       const success = await fetchResults();
-
       if (!success && retryCount < maxRetries) {
         timeoutId = setTimeout(() => {
           setRetryCount((prev) => prev + 1);
@@ -67,15 +57,7 @@ console.log(`Attempting to fetch latest interview for Clerk ID: ${clerkId}`);
 
     attemptFetch();
     return () => clearTimeout(timeoutId);
-  }, [clerkId, retryCount, fetchResults]);
-
-  // ✅ Reset when new callId
-  useEffect(() => {
-    setResults(null);
-    setError(null);
-    setLoading(true);
-    setRetryCount(0);
-  }, [clerkId]);
+  }, [retryCount, fetchResults]);
 
   // ✅ Manual Retry
   const handleManualRetry = () => {
@@ -92,7 +74,6 @@ console.log(`Attempting to fetch latest interview for Clerk ID: ${clerkId}`);
         <Loader2 className="w-16 h-16 text-blue-500 animate-spin mb-4" />
         <h2 className="text-xl text-white mb-2">Processing Interview Results...</h2>
         <p className="text-gray-400 mb-4">
-          {/* Call ID: <span className="font-mono">{callId}</span> <br /> */}
           Attempt {retryCount + 1} of {maxRetries + 1}
         </p>
       </div>
@@ -117,7 +98,7 @@ console.log(`Attempting to fetch latest interview for Clerk ID: ${clerkId}`);
     return (
       <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-4">
         <AlertCircle className="w-16 h-16 text-yellow-500 mb-4" />
-        <h2 className="text-yellow-400">Results Not Available Yet </h2>
+        <h2 className="text-yellow-400">Results Not Available Yet</h2>
         <p className="text-gray-400">
           Could not retrieve results after {maxRetries + 1} attempts.
         </p>

@@ -25,13 +25,13 @@ router.post("/omnidimension", async (req, res) => {
       return res.status(400).json({ error: "Missing callId" });
     }
 
-    // ✅ Debug store for inspection
+    // ✅ Debug store for inspection (optional, local file or memory)
     await debugStoreWebhook(callId, payload);
 
-    // ✅ Normalize AI response for storage
+    // ✅ Normalize AI response for database storage
     const normalized = normalizeResult(payload);
 
-    // ✅ Update if exists, else CREATE (important!)
+    // ✅ Update if exists, else CREATE new interview
     const updatedInterview = await Interview.findOneAndUpdate(
       { callId },
       {
@@ -46,7 +46,7 @@ router.post("/omnidimension", async (req, res) => {
     // ✅ Local debug storage (optional)
     storeInterviewResult(callId, normalized);
 
-    console.log(`✅ Interview saved for Clerk ID: ${updatedInterview.clerkId || "(unknown)"}, Call ID: ${callId}`);
+    console.log(`✅ Interview saved successfully → Call ID: ${callId}`);
     return res.status(200).json({
       message: "✅ Interview updated (or created) successfully!",
       entry: updatedInterview
