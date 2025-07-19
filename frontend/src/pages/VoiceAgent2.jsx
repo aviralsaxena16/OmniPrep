@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Mic, Phone, PhoneOff, Clock, User, AlertCircle } from 'lucide-react';
+import { Phone, PhoneOff, User, AlertCircle } from 'lucide-react';
 
-function VoiceAgent2({ name, education, experience, jobRole, companyName, clerkId }) {
+function VoiceAgent2({ name, education, experience, jobRole, companyName, clerkId, onInterviewComplete }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [widgetReady, setWidgetReady] = useState(false);
+  const [callId, setCallId] = useState(null);
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
+  // ✅ Generate a temporary callId for initial DB mapping
+  const generateTempCallId = () => `temp_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
 
   useEffect(() => {
     const widgetUrl = import.meta.env.VITE_OMNIDIMENSION_WIDGET_URL;
@@ -25,12 +29,77 @@ function VoiceAgent2({ name, education, experience, jobRole, companyName, clerkI
     script.async = true;
     script.id = "omnidimension-web-widget";
 
-    script.onload = () => {
-      console.log('Voice Agent widget script loaded.');
-      setTimeout(() => {
-        setWidgetReady(true);
-        setIsLoading(false);
-      }, 2000);
+    // ✅ Handle OmniDimension widget messages
+    const handleWidgetMessage = async (event) => {
+      if (event.origin !== new URL(widgetUrl).origin) return;
+
+      // When Omni starts the call → Update DB with real callId
+      if (event.data?.type === 'callStarted' && event.data.callId) {
+        console.log('✅ OmniDimension Call Started:', event.data.callId);
+
+        try {
+          await fetch(`${backendUrl}/api/update-callid`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              oldCallId: callId,
+              newCallId: event.data.callId
+            }),
+          });
+
+          setCallId(event.data.callId);
+          console.log('✅ Updated DB with real Call ID');
+        } catch (err) {
+          console.error("❌ Failed to update callId in DB:", err.message);
+        }
+      }
+
+      // When Omni ends the call → Trigger results page
+      if (event.data?.type === 'callEnded' && event.data.callId) {
+        console.log('✅ OmniDimension Call Ended:', event.data.callId);
+        if (onInterviewComplete) {
+          onInterviewComplete(event.data.callId);
+        }
+      }
+    };
+
+    window.addEventListener("message", handleWidgetMessage);
+
+    script.onload = async () => {
+      console.log('✅ Voice Agent widget script loaded.');
+      setWidgetReady(true);
+      setIsLoading(false);
+
+      try {
+        const tempId = generateTempCallId();
+        setCallId(tempId);
+
+        // ✅ Initial mapping in DB
+        const res = await fetch(`${backendUrl}/api/start-omnidimension-call`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("__session")}`,
+          },
+          body: JSON.stringify({
+            call_id: tempId,
+            clerkId, // ✅ IMPORTANT
+            name,
+            education,
+            experience,
+            job_role: jobRole,
+            company_name: companyName,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to start OmniDimension call");
+
+        console.log(`✅ Backend mapping created for Temp Call ID: ${tempId}`);
+      } catch (err) {
+        console.error("❌ Error starting OmniDimension call:", err.message);
+        setError(`Failed to start interview: ${err.message}`);
+      }
     };
 
     script.onerror = () => {
@@ -43,38 +112,9 @@ function VoiceAgent2({ name, education, experience, jobRole, companyName, clerkI
     return () => {
       const scriptToRemove = document.getElementById("omnidimension-web-widget");
       if (scriptToRemove) scriptToRemove.remove();
+      window.removeEventListener("message", handleWidgetMessage);
     };
-  }, []);
-
-  // ✅ Save interview result when session ends
-  const saveInterviewResult = async (interviewData) => {
-    try {
-      const res = await fetch(`${backendUrl}/api/interviews/save`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          clerkId,
-          interviewData,
-          createdAt: new Date(),
-        }),
-      });
-
-      if (!res.ok) throw new Error("Failed to save interview");
-      console.log(`✅ Interview saved for Clerk ID: ${clerkId}`);
-    } catch (err) {
-      console.error("❌ Error saving interview:", err);
-    }
-  };
-
-  // ✅ Example: Call this when interview ends (replace with actual widget callback)
-  const handleInterviewComplete = () => {
-    const dummyInterviewData = {
-      summary: "This is just sample data until real integration",
-      sentiment: "Positive",
-      fullConversation: "Q: Tell me about yourself.\nA: ...",
-    };
-    saveInterviewResult(dummyInterviewData);
-  };
+  }, [name, education, experience, jobRole, companyName, clerkId, onInterviewComplete]);
 
   const handleRetry = () => {
     setError(null);
@@ -87,6 +127,7 @@ function VoiceAgent2({ name, education, experience, jobRole, companyName, clerkI
     <div className="bg-gray-800 shadow-lg rounded-lg p-8 border border-gray-700">
       <h2 className="text-2xl font-bold text-white mb-4">Mock Interview Session</h2>
 
+      {/* Candidate Info */}
       <div className="bg-gray-700 rounded-lg p-4 mb-6 border border-gray-600">
         <h3 className="text-lg font-semibold text-gray-200 mb-3">Candidate Info:</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-300">
@@ -98,6 +139,7 @@ function VoiceAgent2({ name, education, experience, jobRole, companyName, clerkI
         </div>
       </div>
 
+      {/* Status */}
       <div className="text-center mb-6">
         <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 ${
           isLoading ? 'bg-blue-600' : widgetReady ? 'bg-green-600' : 'bg-yellow-600'
@@ -134,17 +176,8 @@ function VoiceAgent2({ name, education, experience, jobRole, companyName, clerkI
       )}
 
       <div className="text-xs text-gray-400 text-center mt-6">
-        Clerk ID: <span className="font-mono">{clerkId}</span>
-      </div>
-
-      {/* ✅ Temp Button to simulate interview completion */}
-      <div className="text-center mt-4">
-        <button
-          onClick={handleInterviewComplete}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Simulate Interview Complete (Save Result)
-        </button>
+        Clerk ID: <span className="font-mono">{clerkId}</span><br />
+        Call ID: <span className="font-mono">{callId || "Generating..."}</span>
       </div>
     </div>
   );

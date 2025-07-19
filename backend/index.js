@@ -3,15 +3,18 @@ import express from 'express';
 import cors from 'cors';
 import cron from 'node-cron';
 import { connectDB, closeDB } from './db.js';
-import { requireAuth } from "@clerk/express"; // ✅ Clerk middleware
+import { requireAuth } from "@clerk/express";
 import userRoutes from './routes/user.js';
 import webhookRoutes from './routes/webhook.js';
 import interviewRoutes from './routes/interview.js';
 import User from './models/User.js';
-import Interview from './models/Interview.js'; // ✅ Added for storing call start data
+import Interview from './models/Interview.js';
 
 const app = express();
 
+/* ======================================================
+   ✅ Middleware & Config
+====================================================== */
 // ✅ Raw body only for OmniDimension webhook verification
 app.use(
   express.json({
@@ -24,7 +27,7 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ CORS Configuration
+// ✅ CORS
 app.use(
   cors({
     origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -34,11 +37,11 @@ app.use(
   })
 );
 
-// ✅ Connect to DB
+// ✅ DB Connect
 connectDB();
 
 /* ======================================================
-   🔔 Interview Reminder Logic
+   🔔 Interview Reminder Logic (unchanged)
 ====================================================== */
 const activeNotifications = new Map();
 cron.schedule('* * * * *', async () => {
@@ -71,6 +74,7 @@ cron.schedule('* * * * *', async () => {
   }
 });
 
+// ✅ Notification Endpoints
 app.get('/api/notifications/:email', (req, res) => {
   const { email } = req.params;
   const userNotifications = [];
@@ -92,21 +96,9 @@ app.delete('/api/notifications/:notificationId', (req, res) => {
   res.json({ success: true });
 });
 
-// ✅ Global Logging (Disable in production)
-if (process.env.NODE_ENV !== 'production') {
-  app.use((req, res, next) => {
-    console.log(`📡 [${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-    if (req.originalUrl.includes('/api/webhooks/omnidimension')) {
-      console.log('🔹 Raw Body:', req.rawBody || '(no raw body captured)');
-    }
-    if (req.body && Object.keys(req.body).length > 0) {
-      console.log('🔹 Parsed Body:', JSON.stringify(req.body, null, 2));
-    }
-    next();
-  });
-}
-
-// ✅ Routes
+/* ======================================================
+   ✅ Routes
+====================================================== */
 app.use('/', userRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/webhooks', webhookRoutes);
@@ -120,25 +112,17 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.get('/api/test', (req, res) => {
-  res.json({
-    message: 'API is working',
-    timestamp: new Date().toISOString(),
-  });
-});
-
 /* ======================================================
    ✅ Start OmniDimension Call (Clerk Protected)
 ====================================================== */
 app.post('/api/start-omnidimension-call', requireAuth(), async (req, res) => {
   try {
-    const clerkId = req.auth.userId; // ✅ Get Clerk user ID
+    const clerkId = req.auth.userId;
     const { call_id, name, education, experience, job_role, company_name } = req.body;
 
     if (!process.env.OMNIDIMENSION_API_KEY || !process.env.OMNIDIMENSION_SECRET_KEY) {
-      return res.status(500).json({ error: 'OmniDimension credentials are missing in environment variables' });
+      return res.status(500).json({ error: 'OmniDimension credentials are missing' });
     }
-
     if (!call_id || !name) {
       return res.status(400).json({ error: 'call_id and name are required' });
     }
@@ -149,14 +133,7 @@ app.post('/api/start-omnidimension-call', requireAuth(), async (req, res) => {
       {
         secret_key: process.env.OMNIDIMENSION_SECRET_KEY,
         call_type: 'web_call',
-        custom_data: {
-          call_id,
-          name,
-          education,
-          experience,
-          job_role,
-          company_name
-        }
+        custom_data: { call_id, name, education, experience, job_role, company_name }
       },
       {
         headers: {
@@ -166,12 +143,11 @@ app.post('/api/start-omnidimension-call', requireAuth(), async (req, res) => {
       }
     );
 
-    // ✅ Save initial interview doc for mapping ClerkId <-> CallId
+    // ✅ Save mapping (Clerk ↔ Call)
     await Interview.create({
       clerkId,
       callId: call_id,
-      interviewData: {}, // will be filled after webhook
-      createdAt: new Date(),
+      interviewData: {},
     });
 
     res.status(200).json({
@@ -189,7 +165,39 @@ app.post('/api/start-omnidimension-call', requireAuth(), async (req, res) => {
   }
 });
 
-// ✅ Error Handler
+// ✅ Update Call ID after Omni starts
+app.post('/api/update-callid', async (req, res) => {
+  try {
+    const { oldCallId, newCallId } = req.body;
+
+    if (!oldCallId || !newCallId) {
+      return res.status(400).json({ success: false, message: "Both oldCallId and newCallId are required" });
+    }
+
+    const updatedInterview = await Interview.findOneAndUpdate(
+      { callId: oldCallId },
+      { callId: newCallId },
+      { new: true }
+    );
+
+    if (!updatedInterview) {
+      return res.status(404).json({ success: false, message: "No interview found with oldCallId" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Call ID updated successfully",
+      entry: updatedInterview
+    });
+  } catch (error) {
+    console.error("❌ Error updating callId:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+/* ======================================================
+   ✅ Error Handler
+====================================================== */
 app.use((err, req, res, next) => {
   console.error('Error:', err);
   res.status(500).json({
@@ -199,7 +207,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Start Server
+/* ======================================================
+   ✅ Start Server
+====================================================== */
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

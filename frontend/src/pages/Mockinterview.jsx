@@ -22,14 +22,38 @@ const Mockinterview = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const requiredFields = ['name', 'education', 'experience', 'jobRole', 'companyName'];
-    const isValid = requiredFields.every(field => formData[field].trim() !== '');
-    if (!isValid) return alert('Please fill in all required fields');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const requiredFields = ['name', 'education', 'experience', 'jobRole', 'companyName'];
+  const isValid = requiredFields.every(field => formData[field].trim() !== '');
+  if (!isValid) return alert('Please fill in all required fields');
 
-    setCurrentView('interview'); // ✅ directly start interview; no callId generation now
-  };
+  try {
+    // ✅ Generate a unique callId (frontend)
+    const callId = `call_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+    // ✅ Save mapping in backend before starting interview
+    await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/start-omnidimension-call`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem("__session") || ""}` // Clerk provides session token
+      },
+      body: JSON.stringify({
+        call_id: callId,
+        clerkId,
+        ...formData
+      })
+    });
+
+    console.log(`✅ ClerkId ${clerkId} mapped to CallId ${callId}`);
+    setCurrentView('interview');
+  } catch (err) {
+    console.error("❌ Failed to start interview:", err);
+    alert("Error starting interview. Please try again.");
+  }
+};
+
 
   const handleReset = () => {
     setFormData({ name: '', education: '', experience: '', jobRole: '', companyName: '' });

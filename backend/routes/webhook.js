@@ -5,14 +5,13 @@ import {
   normalizeResult
 } from "./store.js";
 import Interview from "../models/Interview.js";
-import { requireAuth } from "@clerk/express";
 
 const router = express.Router();
 
 /* ======================================================
-   ✅ OmniDimension Webhook → Creates New Interview Entry
+   ✅ OmniDimension Webhook → Updates or Creates Interview Entry
 ====================================================== */
-router.post("/omnidimension", requireAuth(), async (req, res) => {
+router.post("/omnidimension", async (req, res) => {
   console.log("--- Raw Webhook Body Received ---");
   console.log(JSON.stringify(req.body, null, 2));
   console.log("---------------------------------");
@@ -20,32 +19,38 @@ router.post("/omnidimension", requireAuth(), async (req, res) => {
   try {
     const payload = req.body;
     const callId = payload.call_id || payload.callId;
-    const clerkId = req.auth.userId; // ✅ Clerk-provided authenticated user
 
-    // ✅ Debug-store for inspection
-    await debugStoreWebhook(callId || `unknown_${Date.now()}`, payload);
-
-    if (!clerkId || !callId) {
-      console.error("❌ Missing clerkId or callId in webhook payload");
-      return res.status(400).json({ error: "Missing clerkId or callId" });
+    if (!callId) {
+      console.error("❌ Missing callId in webhook payload");
+      return res.status(400).json({ error: "Missing callId" });
     }
+
+    // ✅ Debug store for inspection
+    await debugStoreWebhook(callId, payload);
 
     // ✅ Normalize AI response for storage
     const normalized = normalizeResult(payload);
 
-    // ✅ CREATE a NEW entry (never update existing)
-    const newInterview = await Interview.create({
-      clerkId,
-      callId,
-      interviewData: normalized,
-      createdAt: new Date()
-    });
+    // ✅ Update if exists, else CREATE (important!)
+    const updatedInterview = await Interview.findOneAndUpdate(
+      { callId },
+      {
+        $set: {
+          interviewData: normalized,
+          updatedAt: new Date()
+        }
+      },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
 
-    // (Optional local storage for debugging)
+    // ✅ Local debug storage (optional)
     storeInterviewResult(callId, normalized);
 
-    console.log(`✅ Interview saved for Clerk ID: ${clerkId}, Call ID: ${callId}`);
-    res.status(201).json({ message: "✅ Interview saved successfully!", entry: newInterview });
+    console.log(`✅ Interview saved for Clerk ID: ${updatedInterview.clerkId || "(unknown)"}, Call ID: ${callId}`);
+    return res.status(200).json({
+      message: "✅ Interview updated (or created) successfully!",
+      entry: updatedInterview
+    });
   } catch (err) {
     console.error("❌ Webhook processing error:", err);
     res.status(500).json({ error: "Internal server error while processing webhook" });

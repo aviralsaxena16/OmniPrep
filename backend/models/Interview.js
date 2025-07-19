@@ -1,9 +1,28 @@
 import mongoose from "mongoose";
 
-const interviewSchema = new mongoose.Schema({
-  clerkId: { type: String, required: true },
-  interviewData: { type: Object, required: true },
-  createdAt: { type: Date, default: Date.now },
-});
+const InterviewSchema = new mongoose.Schema(
+  {
+    clerkId: {
+      type: String,
+      required: true,
+      index: true, // ✅ Fast lookup by clerkId
+    },
+    callId: {
+      type: String,
+      required: true,
+      unique: true, // ✅ Prevent duplicate webhook updates for same call
+      index: true,  // ✅ Speeds up updates via callId
+    },
+    interviewData: {
+      type: Object,
+      default: {},
+    },
+  },
+  { timestamps: true } // ✅ Adds createdAt & updatedAt
+);
 
-export default mongoose.model("Interview", interviewSchema);
+// ✅ Compound index for faster "latest interview" queries
+InterviewSchema.index({ clerkId: 1, updatedAt: -1 });
+
+const Interview = mongoose.model("Interview", InterviewSchema);
+export default Interview;
