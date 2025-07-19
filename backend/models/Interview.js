@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const interviewSchema = new mongoose.Schema(
   {
-    callId: { type: String, required: true, unique: true }, // still required for mapping webhook updates
+    callId: { type: String, unique: true }, 
     interviewData: {
       fullConversation: String,
       summary: String,

@@ -112,11 +112,9 @@ app.get('/health', (req, res) => {
 ====================================================== */
 app.post('/api/start-omnidimension-call', async (req, res) => {
   try {
-    const { name, education, experience, job_role, company_name, clerkId } = req.body;
+    const { name, education, experience, job_role, company_name } = req.body;
 
-    if (!clerkId) {
-      return res.status(400).json({ error: 'Clerk ID is required' });
-    }
+    
 
     if (!process.env.OMNIDIMENSION_API_KEY || !process.env.OMNIDIMENSION_SECRET_KEY) {
       return res.status(500).json({ error: 'OmniDimension credentials are missing' });
@@ -129,7 +127,7 @@ app.post('/api/start-omnidimension-call', async (req, res) => {
       {
         secret_key: process.env.OMNIDIMENSION_SECRET_KEY,
         call_type: 'web_call',
-        custom_data: { call_id: callId, name, education, experience, job_role, company_name },
+        custom_data: { call_id: callId ,name, education, experience, job_role, company_name },
       },
       {
         headers: {
@@ -139,11 +137,7 @@ app.post('/api/start-omnidimension-call', async (req, res) => {
       }
     );
 
-    await Interview.create({
-      clerkId,
-      callId,
-      interviewData: {},
-    });
+    
 
     res.status(200).json({
       success: true,

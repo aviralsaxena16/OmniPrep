@@ -21,8 +21,7 @@ router.post("/omnidimension", async (req, res) => {
     const callId = payload.call_id || payload.callId;
 
     if (!callId) {
-      console.error("❌ Missing callId in webhook payload");
-      return res.status(400).json({ error: "Missing callId" });
+     const callId = `call_${Date.now()}_${Math.floor(Math.random() * 1000)}`
     }
 
     // ✅ Debug store for inspection (optional, local file or memory)

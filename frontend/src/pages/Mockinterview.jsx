@@ -28,7 +28,7 @@ const Mockinterview = () => {
       await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/start-omnidimension-call`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData) // ✅ Only sending form data, no clerkId/callId
+        body: JSON.stringify(formData) 
       });
 
       console.log("✅ Interview session started");

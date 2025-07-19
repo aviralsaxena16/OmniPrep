@@ -119,7 +119,7 @@ const MockinterviewResults = ({ onBack }) => {
           <ArrowLeft className="w-4 h-4 inline mr-2" /> Back
         </button>
         <h1 className="text-2xl text-white">Interview Results</h1>
-        <p className="text-green-300 mt-2">Completed on {formattedDate(timestamp)}</p>
+        {/* <p className="text-green-300 mt-2">Completed on {formattedDate(timestamp)}</p> */}
 
         {summary && (
           <div className="mt-4">
