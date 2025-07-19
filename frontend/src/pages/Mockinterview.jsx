@@ -4,13 +4,15 @@ import MockinterviewResults from './MockInterviewResult';
 import Navbar from './Navbar';
 
 const Mockinterview = () => {
+  const callId = `call_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   const [currentView, setCurrentView] = useState('form');
   const [formData, setFormData] = useState({
     name: '',
     education: '',
     experience: '',
     jobRole: '',
-    companyName: ''
+    companyName: '',
+    callId:callId
   });
 
   const handleInputChange = (e) => {
@@ -25,11 +27,11 @@ const Mockinterview = () => {
     if (!isValid) return alert('Please fill in all required fields');
 
     try {
-      await fetch(`${import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'}/api/start-omnidimension-call`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData) 
-      });
+      // await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/start-omnidimension-call`, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(formData) 
+      // });
 
       console.log("✅ Interview session started");
       setCurrentView('interview');
@@ -40,7 +42,7 @@ const Mockinterview = () => {
   };
 
   const handleReset = () => {
-    setFormData({ name: '', education: '', experience: '', jobRole: '', companyName: '' });
+    setFormData({ name: '', education: '', experience: '', jobRole: '', companyName: '' ,callId:callId});
     setCurrentView('form');
   };
 
