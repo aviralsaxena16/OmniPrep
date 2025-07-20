@@ -184,7 +184,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowLeft, XCircle, AlertCircle, RefreshCw, Loader2, Download } from 'lucide-react';
 // Instead of the dynamic import in the downloadPdfReport function
 import { jsPDF } from 'jspdf';
-
+import Reports from './Reports'
 const MockinterviewResults = ({ onBack }) => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);

@@ -136,18 +136,18 @@ const Mockinterview = () => {
         </div>
 
         {/* Main Container */}
-        <div className="relative z-10 flex flex-col items-center justify-start px-6 lg:px-20 pt-12 pb-16 gap-10">
-          {/* Top Section */}
-          <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-12">
+        <div className="relative z-10 flex flex-col items-center justify-start px-6 lg:px-20 pt-6 pb-16 gap-8">
+          {/* Top Section - Header and Image */}
+          <div className="w-full max-w-6xl flex flex-col lg:flex-row items-center justify-between gap-8 mb-4">
             {/* Left: Header */}
             <div className="max-w-xl text-center lg:text-left">
-              <div className="inline-flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <div className="inline-flex items-center space-x-2 bg-black text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                 <span>AI Interview Ready</span>
               </div>
-              <h1 className="text-5xl font-bold text-black mb-3 leading-tight">Mock Interview</h1>
+              <h1 className="text-5xl font-bold text-black mb-2 leading-tight">Mock Interview</h1>
               <span className="block text-2xl text-gray-600 font-normal mb-4">Practice. Perfect. Succeed.</span>
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-lg text-gray-600 mb-6">
                 Get personalized feedback from our AI interviewer and boost your confidence for real interviews.
               </p>
 
@@ -171,10 +171,52 @@ const Mockinterview = () => {
             {/* Right: Image */}
             <div>
               <img
-                src="/interview2.png"
+                src="/interview4.png"
                 alt="Interview Candidate"
-                className="w-[32rem] h-[28rem] object-contain drop-shadow-2xl"
+                className="w-[28rem] h-[28rem] object-contain drop-shadow-2xl"
               />
+            </div>
+          </div>
+
+          {/* Steps Section */}
+          <div className="w-full max-w-5xl mb-6">
+            <h2 className="text-3xl font-bold text-black text-center mb-6">How It Works?</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {/* Step 1 */}
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-800 text-center hover:shadow-xl transition-all duration-300">
+                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                  1
+                </div>
+                <h3 className="text-lg font-semibold text-black mb-2">Fill Details</h3>
+                <p className="text-gray-600 text-sm">Fill in your details in the form below to get started</p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-800 text-center hover:shadow-xl transition-all duration-300">
+                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                  2
+                </div>
+                <h3 className="text-lg font-semibold text-black mb-2">Start Session</h3>
+                <p className="text-gray-600 text-sm">Begin your AI-powered mock interview session</p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-800 text-center hover:shadow-xl transition-all duration-300">
+                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                  3
+                </div>
+                <h3 className="text-lg font-semibold text-black mb-2">Give Your Best</h3>
+                <p className="text-gray-600 text-sm">Answer questions confidently and showcase your skills</p>
+              </div>
+
+              {/* Step 4 */}
+              <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-800 text-center hover:shadow-xl transition-all duration-300">
+                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
+                  4
+                </div>
+                <h3 className="text-lg font-semibold text-black mb-2">Download Report</h3>
+                <p className="text-gray-600 text-sm">Get detailed feedback and download interview audio</p>
+              </div>
             </div>
           </div>
 

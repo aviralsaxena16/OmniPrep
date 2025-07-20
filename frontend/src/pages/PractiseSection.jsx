@@ -78,7 +78,7 @@ function PractiseSection() {
         {/* Features Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {features.map((feature, index) => (
-            <div key={index} className="group p-6 border border-gray-100 rounded-lg hover:border-black transition-colors">
+            <div key={index} className="group p-6 border border-zinc-800 rounded-lg hover:border-black border-3 transition-colors">
               <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 {feature.icon && <div className="text-white">{feature.icon}</div>}
               </div>

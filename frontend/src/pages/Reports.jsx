@@ -380,7 +380,7 @@ const fetchReports = async () => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
           <div>
             <div className="flex items-center mb-4">
-              <NavLink to="/" className="mr-4 p-2 rounded-lg hover:bg-gray-200 transition-colors">
+              <NavLink to="/home" className="mr-4 p-2 rounded-lg hover:bg-gray-200 transition-colors">
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </NavLink>
               <h1 className="text-3xl font-bold text-black">Interview Reports</h1>
