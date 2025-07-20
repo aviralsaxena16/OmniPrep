@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { NavLink } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
-import { Menu, X, Mic, FlaskConical, Briefcase, BarChart3, FileText, ListTodo, Settings } from 'lucide-react';
+import { Menu, X, Mic, FlaskConical, Briefcase, BarChart3, FileText, ListTodo, Settings, FileSearch } from 'lucide-react';
 import logo from "./../assets/logo.png";
 import { UserButton } from "@clerk/clerk-react";
 
@@ -12,7 +12,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-black shadow-sm border-b border-gray-800 sticky top-0 ">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
@@ -26,7 +26,7 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-6">
+            <div className="ml-10 flex items-baseline space-x-3">
               <NavLink to="/home" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors flex items-center">
                 <BarChart3 className="w-4 h-4 mr-1" />
                 Dashboard
@@ -50,6 +50,10 @@ export default function Navbar() {
               <NavLink to="/upcoming-interview" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors flex items-center">
                 <ListTodo className="w-4 h-4 mr-1" />
                 Your Interviews
+              </NavLink>
+              <NavLink to="/resume-upload" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors flex items-center">
+                <FileSearch className="w-4 h-4 mr-1" />
+                 ResumeAnalyzer
               </NavLink>
             </div>
           </div>
