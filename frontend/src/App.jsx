@@ -10,7 +10,7 @@ import Mockinterview from "./pages/Mockinterview";
 import UpcomingInterviewsPage from "./pages/UpcomingInterview";
 import NotificationHandler from "./pages/NotificationHandler";
 import Reports from './pages/Reports';
-
+import ResumeUploader from "./pages/Resume";
 // Add this route
 
 function App() {
@@ -55,6 +55,14 @@ function App() {
           element={
             <ProtectedRoute>
               <UpcomingInterviewsPage/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/resume-upload"
+          element={
+            <ProtectedRoute>
+              <ResumeUploader />
             </ProtectedRoute>
           }
         />

@@ -198,7 +198,9 @@ import userRoutes from './routes/user.js';
 import webhookRoutes from './routes/webhook.js';
 import interviewRoutes from './routes/interview.js';
 import User from './models/User.js';
-
+import Resume from './routes/resume.js';
+import dotenv from 'dotenv';
+dotenv.config();
 const app = express();
 
 /* ======================================================
@@ -392,6 +394,7 @@ app.post('/api/test-email', async (req, res) => {
 app.use('/', userRoutes);
 app.use('/api/interviews', interviewRoutes);
 app.use('/api/webhooks', webhookRoutes);
+app.use('/resume', Resume);
 
 app.get('/health', (req, res) => {
   res.status(200).json({
